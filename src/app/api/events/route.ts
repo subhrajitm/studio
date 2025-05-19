@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import apiClient from '@/lib/api-client';
-import { authOptions } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 // GET /api/events - Get all events for current user
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions);
+  // Get the token from the Authorization header instead of cookies
+  const authHeader = request.headers.get('Authorization');
+  const token = authHeader ? authHeader.replace('Bearer ', '') : null;
   
-  if (!session?.user) {
+  if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
     const events = await apiClient('/events', {
-      token: session.accessToken,
+      token,
     });
     
     return NextResponse.json(events);
@@ -28,9 +29,11 @@ export async function GET(request: NextRequest) {
 
 // POST /api/events - Create a new event
 export async function POST(request: NextRequest) {
-  const session = await getServerSession(authOptions);
+  // Get the token from the Authorization header
+  const authHeader = request.headers.get('Authorization');
+  const token = authHeader ? authHeader.replace('Bearer ', '') : null;
   
-  if (!session?.user) {
+  if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -39,7 +42,7 @@ export async function POST(request: NextRequest) {
     
     const newEvent = await apiClient('/events', {
       method: 'POST',
-      token: session.accessToken,
+      token,
       data: body,
     });
     

@@ -1,22 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import apiClient from '@/lib/api-client';
-import { authOptions } from '@/lib/auth';
 
 // GET /api/events/:id - Get event by ID
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
+  // Get the token from the Authorization header
+  const authHeader = request.headers.get('Authorization');
+  const token = authHeader ? authHeader.replace('Bearer ', '') : null;
   
-  if (!session?.user) {
+  if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
     const event = await apiClient(`/events/${params.id}`, {
-      token: session.accessToken,
+      token,
     });
     
     return NextResponse.json(event);
@@ -34,9 +34,11 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
+  // Get the token from the Authorization header
+  const authHeader = request.headers.get('Authorization');
+  const token = authHeader ? authHeader.replace('Bearer ', '') : null;
   
-  if (!session?.user) {
+  if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -45,7 +47,7 @@ export async function PUT(
     
     const updatedEvent = await apiClient(`/events/${params.id}`, {
       method: 'PUT',
-      token: session.accessToken,
+      token,
       data: body,
     });
     
@@ -64,16 +66,18 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
+  // Get the token from the Authorization header
+  const authHeader = request.headers.get('Authorization');
+  const token = authHeader ? authHeader.replace('Bearer ', '') : null;
   
-  if (!session?.user) {
+  if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
     await apiClient(`/events/${params.id}`, {
       method: 'DELETE',
-      token: session.accessToken,
+      token,
     });
     
     return NextResponse.json({ success: true });
