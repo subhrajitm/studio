@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { Warranty } from '@/types';
-import { CalendarClock, ShoppingBag, FileText, Edit3, Trash2, AlertTriangle } from 'lucide-react';
+import { CalendarClock, FileText, Edit3, Trash2, AlertTriangle, Tag, Store, DollarSign, StickyNote, CalendarDays } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format, differenceInDays, parseISO, isValid } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -37,7 +37,7 @@ export function WarrantyCard({ warranty, onDelete }: WarrantyCardProps) {
   const getExpiryBadgeVariant = () => {
     switch (expiryStatus) {
       case 'expired': return 'destructive';
-      case 'expiring-soon': return 'default'; // Use primary (orange) for better visibility
+      case 'expiring-soon': return 'default'; 
       case 'active': return 'default'; 
       default: return 'outline';
     }
@@ -68,11 +68,16 @@ export function WarrantyCard({ warranty, onDelete }: WarrantyCardProps) {
              </Badge>
           )}
         </div>
-        {warranty.category && <CardDescription className="text-xs text-muted-foreground">{warranty.category}</CardDescription>}
       </CardHeader>
       <CardContent className="px-4 py-3 space-y-1.5 text-xs">
+        {warranty.category && (
+          <div className="flex items-center">
+            <Tag className="h-3.5 w-3.5 mr-1.5 text-primary" />
+            <span>Category: {warranty.category}</span>
+          </div>
+        )}
         <div className="flex items-center">
-          <ShoppingBag className="h-3.5 w-3.5 mr-1.5 text-primary" />
+          <CalendarDays className="h-3.5 w-3.5 mr-1.5 text-primary" />
           <span>Purchased: {purchaseDate}</span>
         </div>
         <div className="flex items-center">
@@ -80,10 +85,22 @@ export function WarrantyCard({ warranty, onDelete }: WarrantyCardProps) {
           <span>Warranty Ends: {warrantyEndDate}</span>
         </div>
         {warranty.retailer && (
-          <p className="text-muted-foreground">Retailer: {warranty.retailer}</p>
+          <div className="flex items-center">
+            <Store className="h-3.5 w-3.5 mr-1.5 text-primary" />
+            <span>Retailer: {warranty.retailer}</span>
+          </div>
+        )}
+        {warranty.purchasePrice != null && ( // Check for null or undefined
+          <div className="flex items-center">
+            <DollarSign className="h-3.5 w-3.5 mr-1.5 text-primary" />
+            <span>Price: ${warranty.purchasePrice.toFixed(2)}</span>
+          </div>
         )}
         {warranty.notes && (
-          <p className="text-muted-foreground truncate">Notes: {warranty.notes}</p>
+           <div className="flex items-start">
+            <StickyNote className="h-3.5 w-3.5 mr-1.5 text-primary shrink-0 mt-0.5" />
+            <span className="truncate">Notes: {warranty.notes}</span>
+          </div>
         )}
       </CardContent>
       <CardFooter className="flex justify-between items-center px-4 py-3 border-t">
