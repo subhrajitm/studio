@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/auth-context';
 import apiClient from '@/lib/api-client';
 import type { Warranty } from '@/types';
@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent } from '@/components/ui/card';
 import { useState, useEffect } from 'react';
+import { differenceInDays, parseISO } from 'date-fns';
 
 export default function DashboardPage() {
   const { token, user } = useAuth();
@@ -98,7 +99,10 @@ export default function DashboardPage() {
     deleteMutation.mutate(id);
   };
   
-  const activeWarranties = warranties?.filter(w => !expiringWarranties?.find(ew => ew._id === w._id) && differenceInDays(parseISO(w.warrantyEndDate!), new Date()) >= 0);
+  const activeWarranties = warranties?.filter(w => 
+    !expiringWarranties?.find(ew => ew._id === w._id) && 
+    w.warrantyEndDate && differenceInDays(parseISO(w.warrantyEndDate), new Date()) >= 0
+  );
 
 
   if (isLoadingWarranties) {
@@ -271,3 +275,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
