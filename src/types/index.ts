@@ -1,4 +1,5 @@
 
+
 export interface User {
   _id: string;
   username: string;
@@ -80,4 +81,13 @@ export interface ProfileFormValues {
   username: string;
   email: string;
   profilePictureFile?: File | null;
+}
+
+// AI Flow Types
+export interface SummarizeWarrantyDocumentInput {
+  documentDataUri: string;
+}
+
+export interface SummarizeWarrantyDocumentOutput {
+  summary: string;
 }

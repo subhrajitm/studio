@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -11,14 +12,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon, UploadCloud, Sparkles, Loader2, FileText } from 'lucide-react';
+import { CalendarIcon, UploadCloud, Sparkles, Loader2, FileText, AlignLeft } from 'lucide-react';
 import { cn, fileToDataUri } from '@/lib/utils';
 import { format, parseISO, isValid } from 'date-fns';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import type { Warranty, WarrantyFormValues, UploadResponse, ExtractedWarrantyDetails } from '@/types';
 import apiClient from '@/lib/api-client';
-import { extractWarrantyDetails } from '@/ai/flows/extract-warranty-details'; // GenAI Flow
+import { extractWarrantyDetails } from '@/ai/flows/extract-warranty-details'; 
+import { summarizeWarrantyDocument } from '@/ai/flows/summarize-warranty-document-flow';
 import Image from 'next/image';
 
 const warrantyFormSchema = z.object({
@@ -34,7 +36,7 @@ const warrantyFormSchema = z.object({
   purchasePrice: z.coerce.number().positive().optional(),
 }).refine(data => data.warrantyLength || data.warrantyEndDate, {
   message: "Either warranty length or end date must be provided.",
-  path: ["warrantyEndDate"], // You can point to either, or a general form error
+  path: ["warrantyEndDate"], 
 });
 
 
@@ -48,6 +50,8 @@ export function WarrantyForm({ initialData, onSubmitSuccess }: WarrantyFormProps
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isSummarizing, setIsSummarizing] = useState(false);
+  const [extractedSummary, setExtractedSummary] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(initialData?.documentUrl || null);
 
@@ -70,6 +74,7 @@ export function WarrantyForm({ initialData, onSubmitSuccess }: WarrantyFormProps
     if (file) {
       setSelectedFile(file);
       form.setValue('document', file);
+      setExtractedSummary(null); // Clear previous summary if new file is selected
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -77,7 +82,7 @@ export function WarrantyForm({ initialData, onSubmitSuccess }: WarrantyFormProps
         };
         reader.readAsDataURL(file);
       } else {
-        setFilePreview(null); // Or a generic document icon
+        setFilePreview(null); 
       }
     }
   };
@@ -112,6 +117,26 @@ export function WarrantyForm({ initialData, onSubmitSuccess }: WarrantyFormProps
     }
   };
 
+  const handleAISummarize = async () => {
+    if (!selectedFile) {
+      toast({ title: "No file selected", description: "Please select a document to summarize.", variant: "destructive" });
+      return;
+    }
+    setIsSummarizing(true);
+    setExtractedSummary(null);
+    try {
+      const dataUri = await fileToDataUri(selectedFile);
+      const result = await summarizeWarrantyDocument({ documentDataUri: dataUri });
+      setExtractedSummary(result.summary);
+      toast({ title: "Summary Generated", description: "AI has summarized the document." });
+    } catch (error) {
+      console.error("AI Summarization Error:", error);
+      toast({ title: "AI Summarization Failed", description: (error as Error).message || "Could not summarize document.", variant: "destructive" });
+    } finally {
+      setIsSummarizing(false);
+    }
+  };
+
   const onSubmit = async (values: WarrantyFormValues) => {
     setIsSubmitting(true);
     let documentUrl = initialData?.documentUrl;
@@ -125,8 +150,6 @@ export function WarrantyForm({ initialData, onSubmitSuccess }: WarrantyFormProps
           body: formData,
           token,
         });
-        // The API returns a relative path like /uploads/filename.ext
-        // Prepend the base API URL if needed, or use as is if your backend serves it correctly relative to API_BASE_URL
         const API_HOST_URL = 'https://warrityweb-api-x1ev.onrender.com';
         documentUrl = API_HOST_URL + uploadResponse.filePath;
       } catch (error) {
@@ -141,7 +164,7 @@ export function WarrantyForm({ initialData, onSubmitSuccess }: WarrantyFormProps
       purchaseDate: values.purchaseDate ? format(values.purchaseDate, 'yyyy-MM-dd') : undefined,
       warrantyEndDate: values.warrantyEndDate ? format(values.warrantyEndDate, 'yyyy-MM-dd') : undefined,
       documentUrl: documentUrl,
-      document: undefined, // Don't send the File object
+      document: undefined, 
     };
 
     try {
@@ -161,9 +184,10 @@ export function WarrantyForm({ initialData, onSubmitSuccess }: WarrantyFormProps
         toast({ title: "Success", description: "Warranty added successfully." });
       }
       if (onSubmitSuccess) onSubmitSuccess();
-      else form.reset(defaultValues); // Reset form if no custom success handler
+      else form.reset(defaultValues); 
       setSelectedFile(null);
       setFilePreview(null);
+      setExtractedSummary(null);
     } catch (error) {
       toast({ title: "Submission Failed", description: (error as Error).message, variant: "destructive" });
     } finally {
@@ -176,7 +200,7 @@ export function WarrantyForm({ initialData, onSubmitSuccess }: WarrantyFormProps
       <CardHeader>
         <CardTitle className="text-2xl font-bold">{initialData ? 'Edit Warranty' : 'Add New Warranty'}</CardTitle>
         <CardDescription>
-          {initialData ? 'Update the details of your warranty.' : 'Fill in the details of your new warranty. You can also use AI to extract info from a document.'}
+          {initialData ? 'Update the details of your warranty.' : 'Fill in the details of your new warranty. You can also use AI to extract info or summarize a document.'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -297,18 +321,16 @@ export function WarrantyForm({ initialData, onSubmitSuccess }: WarrantyFormProps
             <FormField
               control={form.control}
               name="document"
-              render={({ field }) => (
+              render={({ field }) => ( /* field is not directly used for input type file with react-hook-form custom register */
                 <FormItem>
                   <FormLabel>Warranty Document (Optional)</FormLabel>
                   <FormControl>
-                    <div className="flex items-center space-x-4">
-                      <Input 
-                        type="file" 
-                        accept="image/*,.pdf,.doc,.docx" 
-                        onChange={handleFileChange}
-                        className="flex-grow"
-                      />
-                    </div>
+                    <Input 
+                      type="file" 
+                      accept="image/*,.pdf,.doc,.docx" 
+                      onChange={handleFileChange}
+                      className="flex-grow"
+                    />
                   </FormControl>
                   {filePreview && filePreview.startsWith('data:image') && (
                      <Image src={filePreview} alt="Document preview" width={100} height={100} className="mt-2 rounded-md object-cover" data-ai-hint="receipt warranty" />
@@ -325,12 +347,49 @@ export function WarrantyForm({ initialData, onSubmitSuccess }: WarrantyFormProps
                 </FormItem>
               )}
             />
-             {selectedFile && (
-              <Button type="button" variant="outline" onClick={handleAIExtraction} disabled={isExtracting} className="w-full sm:w-auto">
-                {isExtracting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                Extract Details with AI
-              </Button>
+             <div className="space-y-2 sm:space-y-0 sm:flex sm:space-x-2">
+                {selectedFile && (
+                  <Button type="button" variant="outline" onClick={handleAIExtraction} disabled={isExtracting || isSummarizing} className="w-full sm:w-auto">
+                    {isExtracting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    Extract Details with AI
+                  </Button>
+                )}
+                {selectedFile && (
+                   <Button type="button" variant="outline" onClick={handleAISummarize} disabled={isSummarizing || isExtracting} className="w-full sm:w-auto">
+                    {isSummarizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <AlignLeft className="mr-2 h-4 w-4" />}
+                    Summarize with AI
+                  </Button>
+                )}
+            </div>
+
+            {isSummarizing && (
+              <div className="space-y-2">
+                <Label>AI Summary (Loading...)</Label>
+                <Skeleton className="h-24 w-full" />
+              </div>
             )}
+
+            {extractedSummary && !isSummarizing && (
+              <FormField
+                name="aiSummaryDisplay" // Not part of form submission, just for display
+                control={form.control} // Needs to be part of form for RHF structure, but won't be submitted
+                render={() => (
+                  <FormItem>
+                    <FormLabel>AI Generated Summary</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        readOnly
+                        value={extractedSummary}
+                        className="bg-muted/50"
+                        rows={6}
+                      />
+                    </FormControl>
+                    <FormDescription>This summary is AI-generated. Please review for accuracy.</FormDescription>
+                  </FormItem>
+                )}
+              />
+            )}
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
@@ -389,7 +448,7 @@ export function WarrantyForm({ initialData, onSubmitSuccess }: WarrantyFormProps
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={isSubmitting || isExtracting}>
+            <Button type="submit" className="w-full" disabled={isSubmitting || isExtracting || isSummarizing}>
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               {initialData ? 'Update Warranty' : 'Add Warranty'}
             </Button>
