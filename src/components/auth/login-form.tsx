@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/contexts/auth-context';
 import Link from 'next/link';
-import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -47,10 +47,7 @@ export function LoginForm() {
 
   return (
     <Card className="w-full max-w-md shadow-xl">
-      <CardHeader className="text-center">
-        <div className="flex justify-center items-center mb-4">
-          <ShieldCheck className="h-12 w-12 text-primary" />
-        </div>
+      <CardHeader className="space-y-1"> {/* Adjusted: Removed text-center, ensure default spacing for left alignment */}
         <CardTitle className="text-3xl font-bold">Welcome Back!</CardTitle>
         <CardDescription>Sign in to access your Warranty Wallet.</CardDescription>
       </CardHeader>
