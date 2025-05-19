@@ -7,6 +7,11 @@ interface RequestOptions extends RequestInit {
   token?: string | null;
 }
 
+interface ApiError extends Error {
+  status: number;
+  data: ApiErrorResponse;
+}
+
 async function apiClient<T>(
   endpoint: string,
   { data, token, headers: customHeaders, ...customConfig }: RequestOptions = {}
@@ -40,9 +45,9 @@ async function apiClient<T>(
     // Log the error for easier debugging
     console.error(`API Error (${response.status}) on ${endpoint}:`, errorData);
 
-    const error = new Error(errorData.message || 'An unknown API error occurred');
-    (error as any).status = response.status;
-    (error as any).data = errorData;
+    const error: ApiError = new Error(errorData.message || 'An unknown API error occurred');
+    error.status = response.status;
+    error.data = errorData;
     throw error;
   }
 

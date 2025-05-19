@@ -9,32 +9,32 @@ body {
 
 @layer base {
   :root {
-    /* New Theme based on the provided image (dark with lime green accent) */
+    /* Improved Theme with better contrast */
     --background: 220 20% 10%; /* Dark deep blue/almost black */
     --foreground: 0 0% 98%; /* Light text for dark background */
 
-    --card: 84 70% 58%; /* Vibrant lime green */
-    --card-foreground: 220 20% 15%; /* Dark text for on-card elements */
+    --card: 220 15% 20%; /* Darker card background for better text contrast */
+    --card-foreground: 0 0% 98%; /* Light text for better visibility on cards */
 
     --popover: 220 20% 12%; /* Dark popover */
     --popover-foreground: 0 0% 98%; /* Light text for popover */
 
-    --primary: 84 45% 40%; /* Darker green for login button */
+    --primary: 84 70% 50%; /* Brighter green for better visibility */
     --primary-foreground: 0 0% 98%; /* Light text for primary button */
 
     --secondary: 220 15% 25%; /* Dark secondary elements */
-    --secondary-foreground: 0 0% 90%;
+    --secondary-foreground: 0 0% 95%; /* Lighter text for better contrast */
 
     --muted: 220 10% 20%; /* Muted dark elements */
-    --muted-foreground: 0 0% 60%; /* Muted text (e.g., placeholders on white input) */
+    --muted-foreground: 0 0% 80%; /* Lighter muted text for better visibility */
 
-    --accent: 84 70% 65%; /* Slightly lighter lime for accents if needed */
+    --accent: 84 70% 60%; /* Bright lime for accents */
     --accent-foreground: 220 20% 10%;
 
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 25%; /* Border for elements on dark background */
+    --border: 220 15% 30%; /* Slightly lighter border for better visibility */
     --input: 0 0% 100%; /* White background for input fields */
     --input-foreground: 220 20% 15%; /* Dark text for inside input fields */
     --ring: 84 70% 58%; /* Lime green for focus rings */

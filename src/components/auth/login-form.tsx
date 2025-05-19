@@ -49,9 +49,9 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-sm bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-none">
+    <Card className="w-full max-w-sm bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-none border border-border/30">
       <CardHeader className="space-y-1 items-start text-left p-0 mb-6">
-        <p className="text-sm font-semibold text-card-foreground">login</p>
+        <p className="text-sm font-semibold text-accent">login</p>
         <h2 className="text-3xl font-bold text-card-foreground">welcome back</h2>
       </CardHeader>
       <CardContent className="p-0">
