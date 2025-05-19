@@ -167,16 +167,16 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 pb-24">
       {/* Dashboard Header */}
-      <div className="flex justify-between items-start p-4 pt-6"> {/* items-start for multi-line left content */}
+      <div className="flex justify-between items-start p-4 pt-6">
         <div className="flex-1">
-          <div className="flex items-center space-x-1.5 mb-1">
+          <div className="flex items-center space-x-2 mb-2">
             <ShieldCheck className="h-5 w-5 text-primary" />
             <span className="font-semibold text-md text-primary">Warranty Wallet</span>
           </div>
           <h1 className="text-2xl font-bold text-foreground">Hey, {user?.username || 'User'}!</h1>
           <p className="text-sm text-muted-foreground">Welcome back, manage your warranties with ease.</p>
         </div>
-        <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-primary ml-2 shrink-0">
+        <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-primary ml-4 shrink-0">
           <Link href="/profile">
             <Settings className="h-5 w-5" />
           </Link>
