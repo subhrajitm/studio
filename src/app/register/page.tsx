@@ -2,8 +2,8 @@ import { RegisterForm } from '@/components/auth/register-form';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Register - Warranty Wallet',
-  description: 'Create your Warranty Wallet account.',
+  title: 'Register - Warrity',
+  description: 'Create your Warrity account.',
 };
 
 export default function RegisterPage() {

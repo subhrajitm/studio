@@ -49,7 +49,7 @@ export function LoginForm() {
     <Card className="w-full max-w-md shadow-xl">
       <CardHeader className="space-y-1"> {/* Adjusted: Removed text-center, ensure default spacing for left alignment */}
         <CardTitle className="text-3xl font-bold">Welcome Back!</CardTitle>
-        <CardDescription>Sign in to access your Warranty Wallet.</CardDescription>
+        <CardDescription>Sign in to access your Warrity account.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>

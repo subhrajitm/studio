@@ -94,6 +94,6 @@ export default function EditWarrantyPage() {
 // export async function generateMetadata({ params }: { params: { id: string } }) {
 //   // TODO: Fetch warranty name if possible for title, or keep generic
 //   return {
-//     title: `Edit Warranty - Warranty Wallet`,
+//     title: `Edit Warranty - Warrity`,
 //   };
 // }

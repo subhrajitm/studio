@@ -2,8 +2,8 @@ import { LoginForm } from '@/components/auth/login-form';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Login - Warranty Wallet',
-  description: 'Log in to your Warranty Wallet account.',
+  title: 'Login - Warrity',
+  description: 'Log in to your Warrity account.',
 };
 
 export default function LoginPage() {

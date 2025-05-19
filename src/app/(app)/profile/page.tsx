@@ -6,7 +6,7 @@ export default function ProfilePage() {
   // This page must be a client component for ProfileForm.
   // Dynamic title setting could be done with useEffect if needed.
   // useEffect(() => {
-  //   document.title = 'Profile Settings - Warranty Wallet';
+  //   document.title = 'Profile Settings - Warrity';
   // }, []);
 
   return (
@@ -18,6 +18,6 @@ export default function ProfilePage() {
 
 // Cannot use generateMetadata in a client component.
 // export const metadata: Metadata = {
-//   title: 'Profile Settings - Warranty Wallet',
-//   description: 'Manage your Warranty Wallet account settings.',
+//   title: 'Profile Settings - Warrity',
+//   description: 'Manage your Warrity account settings.',
 // };

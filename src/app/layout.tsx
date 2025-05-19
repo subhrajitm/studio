@@ -15,21 +15,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Warranty Wallet',
-  description: 'Manage your warranties with ease.',
+  title: 'Warrity',
+  description: 'Manage your warranties with ease with Warrity.',
   // Add meta tags for mobile-friendliness
   viewport: 'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover',
-  applicationName: 'Warranty Wallet',
+  applicationName: 'Warrity',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Warranty Wallet',
+    title: 'Warrity',
   },
   formatDetection: {
     telephone: false,
   },
   manifest: '/manifest.json', // Placeholder for PWA manifest
-  themeColor: '#6699CC', // Primary color
+  themeColor: '#62D926', // Updated to match primary green
 };
 
 export default function RootLayout({

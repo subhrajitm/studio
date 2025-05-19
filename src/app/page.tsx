@@ -23,7 +23,7 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
       <div className="flex flex-col items-center space-y-4">
         <ShieldCheck className="h-24 w-24 text-primary animate-pulse" />
-        <p className="text-xl font-semibold text-foreground">Loading Warranty Wallet...</p>
+        <p className="text-xl font-semibold text-foreground">Loading Warrity...</p>
       </div>
     </div>
   );

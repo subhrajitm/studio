@@ -50,7 +50,7 @@ export function RegisterForm() {
     <Card className="w-full max-w-md shadow-xl">
       <CardHeader className="space-y-1"> {/* Adjusted: Removed text-center, ensure default spacing for left alignment */}
         <CardTitle className="text-3xl font-bold">Create Account</CardTitle>
-        <CardDescription>Join Warranty Wallet today!</CardDescription>
+        <CardDescription>Join Warrity today!</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
