@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ListChecks, UserCircle, Plus, Settings } from 'lucide-react';
+import { Home, ListChecks, UserCircle, Plus, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { LucideProps } from 'lucide-react';
 
@@ -16,7 +16,7 @@ interface NavItemType {
 const navItems: NavItemType[] = [
   { href: '/dashboard', label: 'Home', icon: Home },
   { href: '/warranties/all', label: 'Activity', icon: ListChecks },
-  { href: '/settings', label: 'Settings', icon: Settings }, 
+  { href: '/events', label: 'Events', icon: Calendar }, 
   { href: '/profile', label: 'Profile', icon: UserCircle }, 
 ];
 
@@ -49,8 +49,11 @@ export function MobileBottomNav() {
     if (href === '/warranties/all') {
          return pathname.startsWith('/warranties') && !pathname.endsWith('/add');
     }
-    // For /profile or /settings, if multiple items link there, they will all be active.
-    return pathname === href || (href === '/settings' && pathname === '/profile');
+    if (href === '/events') {
+         return pathname.startsWith('/events');
+    }
+    // For /profile, check exact match
+    return pathname === href;
   };
 
   // Items for columns 1 and 2

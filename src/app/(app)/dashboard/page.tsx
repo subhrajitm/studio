@@ -176,19 +176,55 @@ export default function DashboardPage() {
         {/* Removed Settings icon button from here */}
       </div>
 
-      {/* Key Stats Card */}
-      <Card className="mx-4 rounded-xl bg-primary text-primary-foreground shadow-xl">
-        <CardContent className="p-5">
-          <p className="text-sm opacity-80">Total Active Warranties</p>
-          <p className="text-3xl font-bold mt-1">
-            {activeWarranties?.length || 0}
-          </p>
-          <p className="text-sm opacity-80 mt-3">Expiring Soon (30 days)</p>
-          <p className="text-lg font-semibold">
-            {expiringWarranties?.length || 0}
-          </p>
-        </CardContent>
-      </Card>
+      {/* Key Stats Cards */}
+      <div className="flex space-x-3 mx-4">
+        {/* Total Active Warranties Card */}
+        <Card className="flex-1 rounded-lg bg-gradient-to-r from-primary/90 to-primary text-primary-foreground shadow-md overflow-hidden relative">
+          <div className="absolute top-0 right-0 opacity-5">
+            <ShieldCheck className="h-20 w-20 -mt-2 -mr-2" />
+          </div>
+          <CardContent className="p-3 flex items-center">
+            <div className="bg-white/10 rounded-full p-2 mr-3">
+              <ShieldCheck className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="flex items-baseline space-x-1">
+                <span className="text-2xl font-bold">{activeWarranties?.length || 0}</span>
+                <span className="text-xs font-medium opacity-80">active</span>
+              </div>
+              {warranties && warranties.length > 0 && (
+                <p className="text-[10px] opacity-70 mt-0.5">{warranties.length} items protected</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Expiring Soon Card */}
+        <Card className="flex-1 rounded-lg bg-gradient-to-r from-amber-500/90 to-amber-500 text-white shadow-md overflow-hidden relative">
+          <div className="absolute top-0 right-0 opacity-5">
+            <Zap className="h-20 w-20 -mt-2 -mr-2" />
+          </div>
+          <CardContent className="p-3 flex items-center">
+            <div className="bg-white/10 rounded-full p-2 mr-3">
+              <Zap className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="flex items-baseline space-x-1">
+                <span className="text-2xl font-bold">{expiringWarranties?.length || 0}</span>
+                <span className="text-xs font-medium opacity-80">expiring</span>
+              </div>
+              {expiringWarranties && expiringWarranties.length > 0 ? (
+                <p className="text-[10px] opacity-70 mt-0.5">
+                  Next: {expiringWarranties[0]?.warrantyEndDate ? 
+                    `${differenceInDays(parseISO(expiringWarranties[0].warrantyEndDate), new Date())} days` : 'N/A'}
+                </p>
+              ) : (
+                <p className="text-[10px] opacity-70 mt-0.5">Next 30 days</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Action Buttons - slightly overlapping the card from below */}
       <div className="grid grid-cols-4 gap-x-3 gap-y-2 -mt-5 px-4 relative z-10">
