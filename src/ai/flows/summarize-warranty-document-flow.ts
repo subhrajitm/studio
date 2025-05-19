@@ -11,7 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const SummarizeWarrantyDocumentInputSchema = z.object({
+const SummarizeWarrantyDocumentInputSchema = z.object({
   documentDataUri: z
     .string()
     .describe(
@@ -20,7 +20,7 @@ export const SummarizeWarrantyDocumentInputSchema = z.object({
 });
 export type SummarizeWarrantyDocumentInput = z.infer<typeof SummarizeWarrantyDocumentInputSchema>;
 
-export const SummarizeWarrantyDocumentOutputSchema = z.object({
+const SummarizeWarrantyDocumentOutputSchema = z.object({
   summary: z.string().describe('A concise summary of the warranty document, highlighting key terms, coverage periods, and major exclusions.'),
 });
 export type SummarizeWarrantyDocumentOutput = z.infer<typeof SummarizeWarrantyDocumentOutputSchema>;
@@ -59,3 +59,4 @@ const summarizeWarrantyDocumentFlow = ai.defineFlow(
     return output!;
   }
 );
+
