@@ -24,12 +24,12 @@ export default function LoginPage() {
       
       {/* Content */}
       <div className="z-10 p-6 sm:p-8 flex flex-col items-start w-full max-w-5xl mx-auto">
-        <div className="mb-10 relative self-start max-w-2xl">
-          {/* Decorative element */}
-          <div className="absolute -left-8 top-0 bottom-0 w-1 bg-primary rounded-full"></div>
+        <div className="mb-10 relative self-start max-w-2xl flex">
+          {/* Decorative element with inline styles for guaranteed visibility */}
+          <div className="w-1.5 rounded-full mr-4 shadow-md" style={{ backgroundColor: 'hsl(var(--primary))' }}></div>
           
           {/* Main heading with creative left alignment */}
-          <h1 className="text-3xl sm:text-5xl font-bold text-foreground leading-tight text-left pl-8">
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground leading-tight text-left">
             <div className="overflow-hidden">
               <span className="relative inline-block transform transition-transform duration-300 hover:-translate-y-1">
                 <span className="relative z-10">Paperless</span>

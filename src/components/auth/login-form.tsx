@@ -66,7 +66,7 @@ export function LoginForm() {
                     <Input 
                       type="email" // Type remains email
                       placeholder="username" // Placeholder matches image
-                      className="bg-input text-input-foreground placeholder:text-muted-foreground rounded-xl border-0 h-12 text-base" 
+                      className="bg-background border border-border text-black dark:text-white placeholder:text-gray-500 rounded-xl h-12 text-base" 
                       {...field} 
                     />
                   </FormControl>
@@ -84,7 +84,7 @@ export function LoginForm() {
                       <Input 
                         type={showPassword ? "text" : "password"}
                         placeholder="password" 
-                        className="bg-input text-input-foreground placeholder:text-muted-foreground rounded-xl border-0 h-12 text-base pr-10"
+                        className="bg-background border border-border text-black dark:text-white placeholder:text-gray-500 rounded-xl h-12 text-base pr-10"
                         {...field} 
                       />
                       <Button
