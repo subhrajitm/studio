@@ -5,7 +5,7 @@ import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/auth-context';
 import apiClient from '@/lib/api-client';
 import type { Warranty } from '@/types';
-import { WarrantyListItem } from '@/components/warranties/warranty-list-item'; // New compact list item
+import { WarrantyListItem } from '@/components/warranties/warranty-list-item';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { PlusCircle, AlertTriangle, List, UserCircle, Settings, ShieldX, Loader2, ShieldCheck, Info, Zap } from 'lucide-react';
@@ -24,6 +24,8 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { useState, useEffect } from 'react';
 import { differenceInDays, parseISO } from 'date-fns';
+import { Separator } from '@/components/ui/separator';
+
 
 export default function DashboardPage() {
   const { token, user } = useAuth();
@@ -35,6 +37,8 @@ export default function DashboardPage() {
     queryKey: ['dashboardData', user?._id],
     queryFn: async () => {
       if (!token || !user) throw new Error("User not authenticated");
+      // Simulate API delay for skeleton
+      // await new Promise(resolve => setTimeout(resolve, 1500)); 
       const [warranties, expiringWarranties] = await Promise.all([
         apiClient<Warranty[]>('/warranties', { token }),
         apiClient<Warranty[]>('/warranties/expiring', { token })
@@ -46,7 +50,7 @@ export default function DashboardPage() {
 
   const warranties = warrantiesData?.warranties;
   const expiringWarranties = warrantiesData?.expiringWarranties;
-  const isLoadingExpiring = isLoadingWarranties; // Both loaded together
+  const isLoadingExpiring = isLoadingWarranties; 
 
   useEffect(() => {
     if (expiringWarranties && expiringWarranties.length > 0 && !isLoadingExpiring && !warrantiesError) {
@@ -68,7 +72,7 @@ export default function DashboardPage() {
       const lastShownKey = `expiringToastLastShown_${user?._id}`;
       const lastShownTimestamp = sessionStorage.getItem(lastShownKey);
       const now = Date.now();
-      const oneHour = 60 * 60 * 1000;
+      const oneHour = 60 * 60 * 1000; // One hour in milliseconds
 
       if (!lastShownTimestamp || (now - parseInt(lastShownTimestamp, 10) > oneHour)) {
         toast({
@@ -81,6 +85,7 @@ export default function DashboardPage() {
       }
     }
   }, [expiringWarranties, isLoadingExpiring, warrantiesError, toast, user?._id]);
+
 
   const deleteMutation = useMutation<void, Error, string>({
     mutationFn: (warrantyId: string) => apiClient(`/warranties/${warrantyId}`, { method: 'DELETE', token }),
@@ -123,14 +128,14 @@ export default function DashboardPage() {
           {[1,2,3,4].map(i => <Skeleton key={i} className="h-20 rounded-lg" />)}
         </div>
         {/* Lists Skeleton */}
-        <div>
-          <Skeleton className="h-6 w-36 mb-3" />
-          <Skeleton className="h-16 rounded-lg mb-2" />
-          <Skeleton className="h-16 rounded-lg mb-2" />
+        <div className="pt-4">
+          <Skeleton className="h-6 w-36 mb-3 ml-4" />
+          <Skeleton className="h-16 rounded-lg mb-2 mx-4" />
+          <Skeleton className="h-16 rounded-lg mb-2 mx-4" />
         </div>
-        <div>
-          <Skeleton className="h-6 w-48 mb-3" />
-          <Skeleton className="h-16 rounded-lg mb-2" />
+        <div className="pt-2">
+          <Skeleton className="h-6 w-48 mb-3 ml-4" />
+          <Skeleton className="h-16 rounded-lg mb-2 mx-4" />
         </div>
       </div>
     );
@@ -151,6 +156,14 @@ export default function DashboardPage() {
 
   const showExpiringSectionContent = expiringWarranties && expiringWarranties.length > 0;
   const showAllClearMessage = expiringWarranties && expiringWarranties.length === 0 && !isLoadingExpiring;
+  const showActiveWarrantiesContent = activeWarranties && activeWarranties.length > 0;
+
+  const dashboardActions = [
+    { label: 'Add New', icon: PlusCircle, href: '/warranties/add' },
+    { label: 'Expiring', icon: AlertTriangle, href: '#expiring-soon' },
+    { label: 'All Items', icon: List, href: '#all-active' },
+    { label: 'Profile', icon: UserCircle, href: '/profile' },
+  ];
 
   return (
     <div className="space-y-6 pb-24"> {/* Added pb-24 for bottom nav */}
@@ -183,20 +196,14 @@ export default function DashboardPage() {
 
       {/* Action Buttons - slightly overlapping the card from below */}
       <div className="grid grid-cols-4 gap-x-3 gap-y-2 -mt-5 px-4 relative z-10">
-        {[
-          { label: 'Add New', icon: PlusCircle, href: '/warranties/add', color: 'bg-card text-foreground hover:bg-muted' },
-          { label: 'Expiring', icon: AlertTriangle, href: '#expiring-soon', color: 'bg-card text-foreground hover:bg-muted' },
-          { label: 'All Items', icon: List, href: '#all-active', color: 'bg-card text-foreground hover:bg-muted' },
-          { label: 'Profile', icon: UserCircle, href: '/profile', color: 'bg-card text-foreground hover:bg-muted' },
-        ].map(action => (
+        {dashboardActions.map(action => (
           <Link key={action.label} href={action.href} passHref>
             <Button
-              variant="default"
-              className={`flex flex-col items-center justify-center h-20 w-full p-2 rounded-lg shadow-md ${action.color} transition-transform hover:scale-105`}
+              className="flex flex-col items-center justify-center h-20 w-full p-2 rounded-lg shadow-md bg-card text-foreground transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl hover:bg-muted group"
               aria-label={action.label}
             >
-              <action.icon className="h-6 w-6 mb-1" />
-              <span className="text-xs text-center">{action.label}</span>
+              <action.icon className="h-6 w-6 mb-1 text-muted-foreground group-hover:text-primary transition-colors" />
+              <span className="text-xs text-center text-muted-foreground group-hover:text-foreground transition-colors">{action.label}</span>
             </Button>
           </Link>
         ))}
@@ -216,7 +223,7 @@ export default function DashboardPage() {
             </div>
           )}
           {showAllClearMessage && (
-            <div className="text-center py-8 my-4 bg-card rounded-lg">
+            <div className="text-center py-8 my-4 bg-card rounded-lg shadow">
               <ShieldCheck className="mx-auto h-12 w-12 text-primary mb-3" />
               <h3 className="text-md font-semibold text-foreground">All Clear!</h3>
               <p className="text-xs text-muted-foreground">No warranties expiring in the next 30 days.</p>
@@ -225,11 +232,19 @@ export default function DashboardPage() {
         </section>
       )}
       
+       {/* Separator */}
+      {showExpiringSectionContent && showActiveWarrantiesContent && (
+        <div className="px-4">
+          <Separator className="my-4 bg-border/50" />
+        </div>
+      )}
+
+
       {/* All Active Warranties Section */}
       <section className="px-4" id="all-active">
         <h2 className="text-lg font-semibold text-foreground mb-3">All Active Warranties</h2>
         {(!activeWarranties || activeWarranties.length === 0) && !isLoadingWarranties && (
-           <div className="text-center py-10 my-4 bg-card rounded-lg">
+           <div className="text-center py-10 my-4 bg-card rounded-lg shadow">
             <Info className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
             <h3 className="text-md font-semibold text-foreground mb-1">No Active Warranties</h3>
             <p className="text-xs text-muted-foreground mb-4">Add your first warranty to get started!</p>
@@ -275,5 +290,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
