@@ -33,8 +33,6 @@ export function AppHeader() {
 
   return (
     <header className={isDashboard ? "md:hidden sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" : "sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"}>
-      {/* On dashboard, this header is effectively hidden on md+ screens by AppLayout, and on mobile, it's minimal. */}
-      {/* For other pages, it shows fully. */}
       <div className="container flex h-14 items-center justify-between max-w-screen-2xl">
         {!isDashboard && (
           <Link href={isAuthenticated ? "/dashboard" : "/login"} className="flex items-center space-x-2">
@@ -42,8 +40,13 @@ export function AppHeader() {
             <span className="font-bold text-lg sm:inline-block">Warranty Wallet</span>
           </Link>
         )}
-        {/* Spacer to push avatar to the right if logo is hidden on dashboard */}
-        {isDashboard && <div className="flex-1"></div>}
+        
+        {isDashboard && (
+           <Link href="/dashboard" className="flex items-center space-x-2">
+            <ShieldCheck className="h-6 w-6 text-primary" />
+            <span className="font-semibold text-md text-foreground">Warranty Wallet</span>
+          </Link>
+        )}
         
         {isAuthenticated && user && (
           <DropdownMenu>

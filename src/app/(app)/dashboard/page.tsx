@@ -8,7 +8,7 @@ import type { Warranty } from '@/types';
 import { WarrantyListItem } from '@/components/warranties/warranty-list-item';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { PlusCircle, AlertTriangle, List, UserCircle, Settings, ShieldX, Loader2, ShieldCheck, Info, Zap } from 'lucide-react';
+import { PlusCircle, AlertTriangle, List, UserCircle, Settings, ShieldX, Loader2, ShieldCheck, Info, Zap, FileText } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -37,8 +37,6 @@ export default function DashboardPage() {
     queryKey: ['dashboardData', user?._id],
     queryFn: async () => {
       if (!token || !user) throw new Error("User not authenticated");
-      // Simulate API delay for skeleton
-      // await new Promise(resolve => setTimeout(resolve, 1500)); 
       const [warranties, expiringWarranties] = await Promise.all([
         apiClient<Warranty[]>('/warranties', { token }),
         apiClient<Warranty[]>('/warranties/expiring', { token })
@@ -72,7 +70,7 @@ export default function DashboardPage() {
       const lastShownKey = `expiringToastLastShown_${user?._id}`;
       const lastShownTimestamp = sessionStorage.getItem(lastShownKey);
       const now = Date.now();
-      const oneHour = 60 * 60 * 1000; // One hour in milliseconds
+      const oneHour = 60 * 60 * 1000; 
 
       if (!lastShownTimestamp || (now - parseInt(lastShownTimestamp, 10) > oneHour)) {
         toast({
@@ -116,8 +114,9 @@ export default function DashboardPage() {
         {/* Header Skeleton */}
         <div className="flex justify-between items-center mb-6">
           <div>
+            <Skeleton className="h-5 w-40 mb-2" /> 
             <Skeleton className="h-6 w-32 mb-1" />
-            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-48" /> 
           </div>
           <Skeleton className="h-8 w-8 rounded-full" />
         </div>
@@ -166,14 +165,18 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-6 pb-24"> {/* Added pb-24 for bottom nav */}
+    <div className="space-y-6 pb-24">
       {/* Dashboard Header */}
-      <div className="flex justify-between items-center p-4 pt-6">
-        <div>
-          <h1 className="text-xl font-semibold text-foreground">Hey, {user?.username || 'User'}!</h1>
-          <p className="text-sm text-muted-foreground">Welcome back</p>
+      <div className="flex justify-between items-start p-4 pt-6"> {/* items-start for multi-line left content */}
+        <div className="flex-1">
+          <div className="flex items-center space-x-1.5 mb-1">
+            <ShieldCheck className="h-5 w-5 text-primary" />
+            <span className="font-semibold text-md text-primary">Warranty Wallet</span>
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">Hey, {user?.username || 'User'}!</h1>
+          <p className="text-sm text-muted-foreground">Welcome back, manage your warranties with ease.</p>
         </div>
-        <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-primary">
+        <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-primary ml-2 shrink-0">
           <Link href="/profile">
             <Settings className="h-5 w-5" />
           </Link>
@@ -242,7 +245,9 @@ export default function DashboardPage() {
 
       {/* All Active Warranties Section */}
       <section className="px-4" id="all-active">
-        <h2 className="text-lg font-semibold text-foreground mb-3">All Active Warranties</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+             <List className="mr-2 h-5 w-5 text-primary"/> All Active Warranties
+        </h2>
         {(!activeWarranties || activeWarranties.length === 0) && !isLoadingWarranties && (
            <div className="text-center py-10 my-4 bg-card rounded-lg shadow">
             <Info className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
