@@ -33,7 +33,7 @@ export function AppHeader() {
 
   return (
     <header className={isDashboard ? "md:hidden sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" : "sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"}>
-      <div className="container flex h-14 items-center justify-between max-w-screen-2xl">
+      <div className="container flex h-14 items-center justify-between max-w-screen-2xl px-4">
         {!isDashboard && (
           <Link href={isAuthenticated ? "/dashboard" : "/login"} className="flex items-center space-x-2.5">
             <ShieldCheck className="h-7 w-7 text-primary" />
