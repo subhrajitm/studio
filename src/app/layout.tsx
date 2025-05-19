@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers';
@@ -14,11 +14,18 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  minimumScale: 1,
+  viewportFit: 'cover',
+  userScalable: false,
+  themeColor: '#62D926', // Lime green theme color
+};
+
 export const metadata: Metadata = {
   title: 'Warrity',
   description: 'Manage your warranties with ease with Warrity.',
-  // Add meta tags for mobile-friendliness
-  viewport: 'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover',
   applicationName: 'Warrity',
   appleWebApp: {
     capable: true,
@@ -29,7 +36,10 @@ export const metadata: Metadata = {
     telephone: false,
   },
   manifest: '/manifest.json', // Placeholder for PWA manifest
-  themeColor: '#62D926', // Updated to match primary green
+  icons: {
+    icon: '/icons/icon-192x192.png',
+    apple: '/icons/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({
