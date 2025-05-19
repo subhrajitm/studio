@@ -22,11 +22,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   }, [isAuthenticated, isLoading, router]);
 
   if (isLoading || !isAuthenticated) {
-    // Basic skeleton for loading state, could be more specific to new design
     return (
       <div className="flex flex-col min-h-screen bg-background text-foreground">
-        {/* Conditional rendering of header for loading state based on future design */}
-        {/* <AppHeader />  */}
         <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
           <div className="space-y-6">
             <Skeleton className="h-12 w-1/2" />
@@ -37,17 +34,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
         </main>
-        {/* <MobileBottomNav /> */}
       </div>
     );
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      {/* AppHeader will now conditionally render its content based on route */}
-      {/* For dashboard, it might be minimal or handled within DashboardPage itself on larger screens */}
       <AppHeader />
-      <main className={`flex-grow ${isDashboard ? 'p-0' : 'container mx-auto px-4 py-8 md:py-12'} pb-20 md:pb-12`}>
+      <main className={`flex-grow ${isDashboard ? 'p-0' : 'container mx-auto px-4 py-8 md:py-12'} pb-20`}>
         {children}
       </main>
       <MobileBottomNav />
