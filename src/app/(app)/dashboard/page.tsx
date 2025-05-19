@@ -8,7 +8,7 @@ import type { Warranty } from '@/types';
 import { WarrantyCard } from '@/components/warranties/warranty-card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { PlusCircle, AlertTriangle, Loader2, ShieldX, Info } from 'lucide-react';
+import { PlusCircle, AlertTriangle, Loader2, ShieldX, Info, ShieldCheck } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -21,6 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Separator } from '@/components/ui/separator';
 import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
@@ -60,7 +61,6 @@ export default function DashboardPage() {
       
       description += ' Check the "Expiring Soon" section for details.';
 
-      // Check if a similar toast was shown recently to avoid spamming
       const lastShownKey = `expiringToastLastShown_${user?._id}`;
       const lastShownTimestamp = sessionStorage.getItem(lastShownKey);
       const now = Date.now();
@@ -99,16 +99,21 @@ export default function DashboardPage() {
   if (isLoadingWarranties || isLoadingExpiring) {
     return (
       <div className="space-y-8">
+        <div className="flex justify-between items-center mb-6">
+          <Skeleton className="h-9 w-56" />
+          <Skeleton className="h-11 w-44" />
+        </div>
         <div>
           <Skeleton className="h-8 w-48 mb-4" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-60 rounded-lg" />)}
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-52 rounded-lg" />)}
           </div>
         </div>
+        <Skeleton className="h-px w-full my-8" />
         <div>
           <Skeleton className="h-8 w-64 mb-4" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1,2].map((i) => <Skeleton key={i} className="h-60 rounded-lg" />)}
+            {[1,2].map((i) => <Skeleton key={i} className="h-52 rounded-lg" />)}
           </div>
         </div>
       </div>
@@ -133,7 +138,9 @@ export default function DashboardPage() {
   }
   
   const activeWarranties = warranties?.filter(w => !expiringWarranties?.find(ew => ew._id === w._id));
-
+  const showExpiringSectionContent = expiringWarranties && expiringWarranties.length > 0;
+  const showAllClearMessage = expiringWarranties && expiringWarenties.length === 0 && !isLoadingExpiring;
+  const showActiveWarrantiesContent = activeWarranties && activeWarranties.length > 0;
 
   return (
     <div className="space-y-8">
@@ -146,42 +153,45 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      {expiringWarranties && expiringWarranties.length > 0 && (
+      { (showExpiringSectionContent || showAllClearMessage) && (
         <section>
-          <h2 className="text-2xl font-semibold mb-4 flex items-center">
-            <AlertTriangle className="mr-2 h-6 w-6 text-destructive" /> Expiring Soon
+          <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-border/60 flex items-center">
+            <AlertTriangle className="mr-2 h-6 w-6 text-primary" /> Expiring Soon
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {expiringWarranties.map((warranty) => (
-              <WarrantyCard key={warranty._id} warranty={warranty} onDelete={() => setWarrantyToDelete(warranty._id)} />
-            ))}
-          </div>
+          {showExpiringSectionContent && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {expiringWarranties.map((warranty) => (
+                <WarrantyCard key={warranty._id} warranty={warranty} onDelete={() => setWarrantyToDelete(warranty._id)} />
+              ))}
+            </div>
+          )}
+          {showAllClearMessage && (
+            <div className="text-center py-8 border-2 border-dashed border-muted rounded-lg bg-card">
+              <ShieldCheck className="mx-auto h-12 w-12 text-green-500 mb-4" />
+              <h3 className="text-xl font-semibold">All Clear!</h3>
+              <p className="text-muted-foreground">You have no warranties expiring soon.</p>
+            </div>
+          )}
         </section>
       )}
-       {expiringWarranties && expiringWarranties.length === 0 && !isLoadingExpiring && (
-          <div className="text-center py-6 border-2 border-dashed border-muted-foreground/20 rounded-lg bg-card">
-            <ShieldCheck className="mx-auto h-10 w-10 text-green-500 mb-3" />
-            <h3 className="text-lg font-medium">All Clear!</h3>
-            <p className="text-sm text-muted-foreground">You have no warranties expiring soon.</p>
-          </div>
-        )}
-
+      
+      { (showExpiringSectionContent || showAllClearMessage) && showActiveWarrantiesContent && <Separator className="my-8" /> }
 
       <section>
-        <h2 className="text-2xl font-semibold mb-4">All Active Warranties</h2>
+        <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-border/60">All Active Warranties</h2>
         {(!activeWarranties || activeWarranties.length === 0) && !isLoadingWarranties && (
-           <div className="text-center py-10 border-2 border-dashed border-muted-foreground/30 rounded-lg">
-            <Info className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No Active Warranties</h3>
-            <p className="text-muted-foreground mb-4">Add your first warranty to get started!</p>
-            <Button asChild>
+           <div className="text-center py-12 border-2 border-dashed border-muted rounded-lg bg-card">
+            <Info className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No Active Warranties Yet</h3>
+            <p className="text-muted-foreground mb-6">Looks like your warranty list is empty. Add your first one!</p>
+            <Button asChild size="lg">
               <Link href="/warranties/add">
-                <PlusCircle className="mr-2 h-5 w-5" /> Add Warranty
+                <PlusCircle className="mr-2 h-5 w-5" /> Add Your First Warranty
               </Link>
             </Button>
           </div>
         )}
-        {activeWarranties && activeWarranties.length > 0 && (
+        {showActiveWarrantiesContent && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activeWarranties.map((warranty) => (
               <WarrantyCard key={warranty._id} warranty={warranty} onDelete={() => setWarrantyToDelete(warranty._id)} />
@@ -216,4 +226,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

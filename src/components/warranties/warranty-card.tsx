@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -7,6 +8,7 @@ import type { Warranty } from '@/types';
 import { CalendarClock, ShoppingBag, FileText, Edit3, Trash2, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format, differenceInDays, parseISO, isValid } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface WarrantyCardProps {
   warranty: Warranty;
@@ -35,8 +37,8 @@ export function WarrantyCard({ warranty, onDelete }: WarrantyCardProps) {
   const getExpiryBadgeVariant = () => {
     switch (expiryStatus) {
       case 'expired': return 'destructive';
-      case 'expiring-soon': return 'secondary'; // Yellowish/Orange if theme supports, otherwise secondary
-      case 'active': return 'default'; // Or a green variant like accent if appropriate
+      case 'expiring-soon': return 'default'; // Use primary (orange) for better visibility
+      case 'active': return 'default'; 
       default: return 'outline';
     }
   };
@@ -48,12 +50,17 @@ export function WarrantyCard({ warranty, onDelete }: WarrantyCardProps) {
     return 'Ends ' + warrantyEndDate;
   };
 
+  const cardClasses = cn(
+    "flex flex-col justify-between shadow-lg hover:shadow-xl transition-shadow duration-300",
+    expiryStatus === 'expiring-soon' && "border-l-4 border-primary",
+    expiryStatus === 'expired' && "border-l-4 border-destructive"
+  );
 
   return (
-    <Card className="flex flex-col justify-between shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <CardHeader>
+    <Card className={cardClasses}>
+      <CardHeader className="px-4 py-3">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-xl font-semibold mb-1">{warranty.productName}</CardTitle>
+          <CardTitle className="text-lg font-semibold mb-0.5">{warranty.productName}</CardTitle>
           {expiryStatus !== 'unknown' && (
              <Badge variant={getExpiryBadgeVariant()} className="ml-2 shrink-0">
                {expiryStatus === 'expiring-soon' && <AlertTriangle className="h-3 w-3 mr-1" />}
@@ -61,29 +68,29 @@ export function WarrantyCard({ warranty, onDelete }: WarrantyCardProps) {
              </Badge>
           )}
         </div>
-        {warranty.category && <CardDescription className="text-sm text-muted-foreground">{warranty.category}</CardDescription>}
+        {warranty.category && <CardDescription className="text-xs text-muted-foreground">{warranty.category}</CardDescription>}
       </CardHeader>
-      <CardContent className="space-y-3 text-sm">
+      <CardContent className="px-4 py-3 space-y-1.5 text-xs">
         <div className="flex items-center">
-          <ShoppingBag className="h-4 w-4 mr-2 text-primary" />
+          <ShoppingBag className="h-3.5 w-3.5 mr-1.5 text-primary" />
           <span>Purchased: {purchaseDate}</span>
         </div>
         <div className="flex items-center">
-          <CalendarClock className="h-4 w-4 mr-2 text-primary" />
+          <CalendarClock className="h-3.5 w-3.5 mr-1.5 text-primary" />
           <span>Warranty Ends: {warrantyEndDate}</span>
         </div>
         {warranty.retailer && (
-          <p className="text-xs text-muted-foreground">Retailer: {warranty.retailer}</p>
+          <p className="text-muted-foreground">Retailer: {warranty.retailer}</p>
         )}
         {warranty.notes && (
-          <p className="text-xs text-muted-foreground truncate">Notes: {warranty.notes}</p>
+          <p className="text-muted-foreground truncate">Notes: {warranty.notes}</p>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between items-center pt-4 border-t">
+      <CardFooter className="flex justify-between items-center px-4 py-3 border-t">
         <div className="space-x-2">
           <Button variant="outline" size="sm" asChild>
             <Link href={`/warranties/${warranty._id}`}>
-              <Edit3 className="h-4 w-4 mr-1 md:mr-2" />
+              <Edit3 className="h-4 w-4 md:mr-1.5" />
               <span className="hidden md:inline">View/Edit</span>
               <span className="md:hidden">Edit</span>
             </Link>
@@ -91,7 +98,7 @@ export function WarrantyCard({ warranty, onDelete }: WarrantyCardProps) {
           {warranty.documentUrl && (
             <Button variant="ghost" size="sm" asChild>
               <a href={warranty.documentUrl} target="_blank" rel="noopener noreferrer">
-                <FileText className="h-4 w-4 mr-1 md:mr-2" />
+                <FileText className="h-4 w-4 md:mr-1.5" />
                  <span className="hidden md:inline">Document</span>
                  <span className="md:hidden">Doc</span>
               </a>
