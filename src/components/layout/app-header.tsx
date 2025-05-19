@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { ShieldCheck, UserCircle, LogOut, Settings } from 'lucide-react';
+import { UserCircle, LogOut, Settings } from 'lucide-react'; // Removed ShieldCheck
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,15 +35,15 @@ export function AppHeader() {
     <header className={isDashboard ? "md:hidden sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" : "sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"}>
       <div className="container flex h-14 items-center justify-between max-w-screen-2xl px-4">
         {!isDashboard && (
-          <Link href={isAuthenticated ? "/dashboard" : "/login"} className="flex items-center space-x-2.5">
-            <ShieldCheck className="h-7 w-7 text-primary" />
+          <Link href={isAuthenticated ? "/dashboard" : "/login"} className="flex items-center"> {/* Removed space-x-2.5 */}
+            {/* ShieldCheck icon removed */}
             <span className="font-bold text-lg sm:inline-block">Warranty Wallet</span>
           </Link>
         )}
         
         {isDashboard && (
-           <Link href="/dashboard" className="flex items-center space-x-2.5">
-            <ShieldCheck className="h-6 w-6 text-primary" />
+           <Link href="/dashboard" className="flex items-center"> {/* Removed space-x-2.5 */}
+            {/* ShieldCheck icon removed */}
             <span className="font-semibold text-md text-foreground">Warranty Wallet</span>
           </Link>
         )}
