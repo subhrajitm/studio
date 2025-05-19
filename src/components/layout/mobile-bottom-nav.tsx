@@ -3,27 +3,28 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ListChecks, UserCircle, Plus } from 'lucide-react';
+import { Home, ListChecks, UserCircle, Plus, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { LucideProps } from 'lucide-react';
 
-interface NavItem {
+interface NavItemType { // Renamed to NavItemType to avoid conflict with component name
   href: string;
   label: string;
   icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
 }
 
-const navItems: NavItem[] = [
+const navItems: NavItemType[] = [
   { href: '/dashboard', label: 'Home', icon: Home },
   { href: '/warranties/all', label: 'Activity', icon: ListChecks },
-  { href: '/profile', label: 'Profile', icon: UserCircle },
+  { href: '/profile', label: 'Settings', icon: Settings }, // Added Settings
+  { href: '/profile', label: 'Profile', icon: UserCircle }, // Kept Profile, could be differentiated later
 ];
 
 // Helper component for rendering individual nav items
-const NavItemLink = ({ item, isActive }: { item: NavItem; isActive: boolean }) => {
+const NavItemLink = ({ item, isActive }: { item: NavItemType; isActive: boolean }) => {
   return (
     <Link
-      key={item.href}
+      key={item.href + item.label} // Ensure key is unique if hrefs are same
       href={item.href}
       className={cn(
         "flex flex-col items-center justify-center space-y-1 rounded-md p-2 text-sm font-medium transition-colors h-full",
@@ -48,16 +49,20 @@ export function MobileBottomNav() {
     if (href === '/warranties/all') {
          return pathname.startsWith('/warranties') && !pathname.endsWith('/add');
     }
+    // For /profile, if multiple items link there, they will all be active.
+    // If Settings and Profile link to /profile, both will be active on /profile.
     return pathname === href;
   };
 
+  // Items for columns 1 and 2
   const leftNavElements = navItems.slice(0, 2).map((item) => (
-    <NavItemLink key={item.href} item={item} isActive={isActive(item.href)} />
+    <NavItemLink key={item.label} item={item} isActive={isActive(item.href)} />
   ));
   
-  // navItems[2] is 'Profile' in the current setup
+  // Items for columns 4 and 5
+  // With 4 items in navItems, navItems.slice(2) will get items at index 2 and 3
   const rightNavElements = navItems.slice(2).map((item) => (
-    <NavItemLink key={item.href} item={item} isActive={isActive(item.href)} />
+    <NavItemLink key={item.label} item={item} isActive={isActive(item.href)} />
   ));
 
   return (
@@ -65,7 +70,7 @@ export function MobileBottomNav() {
       <div className="container mx-auto grid h-16 max-w-md grid-cols-5 items-center px-2 sm:px-4">
         {leftNavElements}
 
-        {/* Central Add Button */}
+        {/* Central Add Button (Column 3) */}
         <div className="flex justify-center items-center h-full">
           <Link
             href="/warranties/add"
@@ -80,11 +85,7 @@ export function MobileBottomNav() {
         </div>
 
         {/* Render items for the right side (columns 4 and 5) */}
-        {/* If there's only one item for the right side (e.g., Profile), 
-            and we have two slots (col 4, col 5), add an empty div 
-            to occupy col 4, pushing Profile to col 5 for symmetry.
-        */}
-        {rightNavElements.length === 1 && <div key="empty-right-slot-placeholder" />}
+        {/* The placeholder logic is removed as navItems now provides enough items */}
         {rightNavElements}
       </div>
     </nav>
