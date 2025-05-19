@@ -3,23 +3,46 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ListChecks, UserCircle, Plus } from 'lucide-react'; // Updated icons
+import { Home, ListChecks, UserCircle, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { LucideProps } from 'lucide-react';
 
-const navItems = [
+interface NavItem {
+  href: string;
+  label: string;
+  icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
+}
+
+const navItems: NavItem[] = [
   { href: '/dashboard', label: 'Home', icon: Home },
-  { href: '/warranties/all', label: 'Activity', icon: ListChecks }, // Assuming an "all warranties" page or similar
+  { href: '/warranties/all', label: 'Activity', icon: ListChecks },
   { href: '/profile', label: 'Profile', icon: UserCircle },
 ];
+
+// Helper component for rendering individual nav items
+const NavItemLink = ({ item, isActive }: { item: NavItem; isActive: boolean }) => {
+  return (
+    <Link
+      key={item.href}
+      href={item.href}
+      className={cn(
+        "flex flex-col items-center justify-center space-y-1 rounded-md p-2 text-sm font-medium transition-colors h-full",
+        isActive
+          ? "text-primary"
+          : "text-muted-foreground hover:text-primary",
+      )}
+    >
+      <item.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+      <span className="text-[0.6rem] sm:text-xs">{item.label}</span>
+    </Link>
+  );
+};
 
 export function MobileBottomNav() {
   const pathname = usePathname();
 
-  // Determine if an item is active. Special handling for the "Add" button might be needed if it's not a route.
-  // For now, the central button is a link to /warranties/add.
   const isActive = (href: string) => {
     if (href === '/dashboard') {
-      // Active if it's exactly /dashboard or if it's a warranty detail page (implying navigated from dashboard)
       return pathname === href || (pathname.startsWith('/warranties/') && !pathname.endsWith('/add') && !pathname.endsWith('/all'));
     }
     if (href === '/warranties/all') {
@@ -28,24 +51,19 @@ export function MobileBottomNav() {
     return pathname === href;
   };
 
+  const leftNavElements = navItems.slice(0, 2).map((item) => (
+    <NavItemLink key={item.href} item={item} isActive={isActive(item.href)} />
+  ));
+  
+  // navItems[2] is 'Profile' in the current setup
+  const rightNavElements = navItems.slice(2).map((item) => (
+    <NavItemLink key={item.href} item={item} isActive={isActive(item.href)} />
+  ));
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 md:hidden">
-      <div className="container mx-auto grid h-16 max-w-md grid-cols-5 items-center px-2 sm:px-4"> {/* 5 columns for central button */}
-        {navItems.slice(0, 2).map((item) => ( // First two items
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex flex-col items-center justify-center space-y-1 rounded-md p-2 text-sm font-medium transition-colors h-full",
-              isActive(item.href)
-                ? "text-primary"
-                : "text-muted-foreground hover:text-primary",
-            )}
-          >
-            <item.icon className="h-5 w-5 sm:h-6 sm:w-6" />
-            <span className="text-[0.6rem] sm:text-xs">{item.label}</span>
-          </Link>
-        ))}
+      <div className="container mx-auto grid h-16 max-w-md grid-cols-5 items-center px-2 sm:px-4">
+        {leftNavElements}
 
         {/* Central Add Button */}
         <div className="flex justify-center items-center h-full">
@@ -61,21 +79,13 @@ export function MobileBottomNav() {
           </Link>
         </div>
 
-        {navItems.slice(2).map((item) => ( // Last item (Profile)
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex flex-col items-center justify-center space-y-1 rounded-md p-2 text-sm font-medium transition-colors h-full",
-              isActive(item.href)
-                ? "text-primary"
-                : "text-muted-foreground hover:text-primary",
-            )}
-          >
-            <item.icon className="h-5 w-5 sm:h-6 sm:w-6" />
-            <span className="text-[0.6rem] sm:text-xs">{item.label}</span>
-          </Link>
-        ))}
+        {/* Render items for the right side (columns 4 and 5) */}
+        {/* If there's only one item for the right side (e.g., Profile), 
+            and we have two slots (col 4, col 5), add an empty div 
+            to occupy col 4, pushing Profile to col 5 for symmetry.
+        */}
+        {rightNavElements.length === 1 && <div key="empty-right-slot-placeholder" />}
+        {rightNavElements}
       </div>
     </nav>
   );
