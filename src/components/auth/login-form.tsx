@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -6,16 +7,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Card, CardContent, CardHeader } from '@/components/ui/card'; // Removed CardDescription, CardFooter, CardTitle
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/contexts/auth-context';
 import Link from 'next/link';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ArrowUpRight, ArrowRightCircle, Loader2 } from 'lucide-react';
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  // To match the visual "username" but retain email functionality for the backend:
+  // The field name remains 'email', but placeholder will be 'username'.
+  // If actual username login is desired, this schema and backend would need to change.
+  email: z.string().email({ message: "Please enter a valid email." }), // Assuming it's still an email for backend
+  password: z.string().min(1, { message: "Password is required." }), // Min 1 to match image simplicity
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -28,7 +31,7 @@ export function LoginForm() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      email: "", // Field is 'email'
       password: "",
     },
   });
@@ -36,8 +39,8 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      await login(data);
-      // Redirect is handled by AuthContext
+      // The auth context expects an 'email' field in the credentials object.
+      await login({ email: data.email, password: data.password });
     } catch (error) {
       // Error toast is handled by AuthContext
     } finally {
@@ -46,24 +49,28 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-xl">
-      <CardHeader className="space-y-1"> {/* Adjusted: Removed text-center, ensure default spacing for left alignment */}
-        <CardTitle className="text-3xl font-bold">Welcome Back!</CardTitle>
-        <CardDescription>Sign in to access your Warrity account.</CardDescription>
+    <Card className="w-full max-w-sm bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-none">
+      <CardHeader className="space-y-1 items-start text-left p-0 mb-6">
+        <p className="text-sm font-semibold text-card-foreground">login</p>
+        <h2 className="text-3xl font-bold text-card-foreground">welcome back</h2>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
-              name="email"
+              name="email" // Field name is email
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="you@example.com" {...field} />
+                    <Input 
+                      type="email" // Type remains email
+                      placeholder="username" // Placeholder matches image
+                      className="bg-input text-input-foreground placeholder:text-muted-foreground rounded-xl border-0 h-12 text-base" 
+                      {...field} 
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-destructive-foreground/80" />
                 </FormItem>
               )}
             />
@@ -72,47 +79,62 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input 
                         type={showPassword ? "text" : "password"}
-                        placeholder="••••••••" 
+                        placeholder="password" 
+                        className="bg-input text-input-foreground placeholder:text-muted-foreground rounded-xl border-0 h-12 text-base pr-10"
                         {...field} 
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-card-foreground"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
                       </Button>
                     </div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-destructive-foreground/80" />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Signing In...' : 'Sign In'}
+            <Button 
+              type="submit" 
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl h-12 text-base font-semibold flex items-center justify-center gap-2" 
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <ArrowUpRight className="h-5 w-5" />
+              )}
+              Login
             </Button>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex flex-col items-center space-y-2">
-        <Link href="/forgot-password">
-          <Button variant="link" className="text-sm p-0 h-auto">Forgot password?</Button>
+      <div className="mt-8 space-y-3">
+        <Link href="/forgot-password" legacyBehavior>
+          <a className="flex items-center gap-2 text-sm text-card-foreground font-semibold hover:opacity-80 transition-opacity">
+            <ArrowRightCircle className="h-5 w-5" />
+            forgot password?
+          </a>
         </Link>
-        <p className="text-sm text-muted-foreground">
-          Don&apos;t have an account?{' '}
-          <Link href="/register" className="font-semibold text-primary hover:underline">
-            Sign up
+        <div className="flex items-center gap-2 text-sm text-card-foreground font-semibold">
+            <ArrowRightCircle className="h-5 w-5" />
+            don&apos;t have an account?{' '}
+          <Link href="/register" legacyBehavior>
+            <a className="underline hover:opacity-80 transition-opacity">
+              sign up
+            </a>
           </Link>
-        </p>
-      </CardFooter>
+        </div>
+      </div>
     </Card>
   );
 }

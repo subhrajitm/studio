@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,52 +9,53 @@ body {
 
 @layer base {
   :root {
-    /* Dark Theme with Green Accent (Inspired by Splitz design) */
-    --background: 200 25% 12%; /* Dark bluish-grey */
-    --foreground: 200 10% 90%; /* Light grey/off-white */
+    /* New Theme based on the provided image (dark with lime green accent) */
+    --background: 220 20% 10%; /* Dark deep blue/almost black */
+    --foreground: 0 0% 98%; /* Light text for dark background */
 
-    --card: 200 25% 18%; /* Slightly lighter dark bluish-grey for cards */
-    --card-foreground: 200 10% 90%;
+    --card: 84 70% 58%; /* Vibrant lime green */
+    --card-foreground: 220 20% 15%; /* Dark text for on-card elements */
 
-    --popover: 200 25% 15%;
-    --popover-foreground: 200 10% 90%;
+    --popover: 220 20% 12%; /* Dark popover */
+    --popover-foreground: 0 0% 98%; /* Light text for popover */
 
-    --primary: 100 70% 50%; /* Bright Green */
-    --primary-foreground: 200 25% 10%; /* Dark text for contrast on green */
+    --primary: 84 45% 40%; /* Darker green for login button */
+    --primary-foreground: 0 0% 98%; /* Light text for primary button */
 
-    --secondary: 200 20% 25%; /* Medium bluish-grey */
-    --secondary-foreground: 200 10% 85%;
+    --secondary: 220 15% 25%; /* Dark secondary elements */
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 200 20% 22%; /* Muted bluish-grey */
-    --muted-foreground: 200 10% 60%; /* Muted text */
+    --muted: 220 10% 20%; /* Muted dark elements */
+    --muted-foreground: 0 0% 60%; /* Muted text (e.g., placeholders on white input) */
 
-    --accent: 100 70% 55%; /* Slightly lighter green for accents if needed */
-    --accent-foreground: 200 25% 10%;
+    --accent: 84 70% 65%; /* Slightly lighter lime for accents if needed */
+    --accent-foreground: 220 20% 10%;
 
-    --destructive: 0 70% 55%; /* Red for destructive actions */
-    --destructive-foreground: 0 0% 100%; /* White text on red */
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 200 20% 25%; /* Border for cards/inputs */
-    --input: 200 20% 25%; /* Input background / border */
-    --ring: 100 70% 55%; /* Green for focus rings */
+    --border: 220 15% 25%; /* Border for elements on dark background */
+    --input: 0 0% 100%; /* White background for input fields */
+    --input-foreground: 220 20% 15%; /* Dark text for inside input fields */
+    --ring: 84 70% 58%; /* Lime green for focus rings */
 
-    --chart-1: 100 70% 50%;
-    --chart-2: 120 60% 45%;
-    --chart-3: 180 50% 40%;
-    --chart-4: 80 65% 60%;
-    --chart-5: 90 75% 55%;
+    --chart-1: 84 70% 58%;
+    --chart-2: 95 60% 55%;
+    --chart-3: 105 50% 50%;
+    --chart-4: 75 65% 60%;
+    --chart-5: 80 75% 55%;
 
-    --radius: 0.5rem;
+    --radius: 0.8rem; /* Slightly larger radius for more rounded feel */
 
-    /* Sidebar specific colors - adjust if sidebar is used extensively with this theme */
-    --sidebar-background: 200 25% 15%;
-    --sidebar-foreground: 200 10% 85%;
-    --sidebar-primary: 100 70% 50%;
-    --sidebar-primary-foreground: 200 25% 10%;
-    --sidebar-accent: 200 20% 30%;
-    --sidebar-accent-foreground: 200 10% 90%;
-    --sidebar-border: 200 20% 25%;
-    --sidebar-ring: 100 70% 55%;
+    /* Sidebar specific colors - adapt if necessary for the new theme */
+    --sidebar-background: 220 20% 12%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 84 70% 58%;
+    --sidebar-primary-foreground: 220 20% 10%;
+    --sidebar-accent: 220 15% 30%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 220 15% 25%;
+    --sidebar-ring: 84 70% 58%;
   }
 
   /* Fallback light theme (original theme) if .dark class is NOT applied */
@@ -112,10 +114,11 @@ body {
     border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary/50;
+    /* Using a color that fits the new dark theme, can be accent or primary */
+    background-color: hsl(var(--primary)); 
     border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary/70;
+    background-color: hsl(var(--accent));
   }
 }
