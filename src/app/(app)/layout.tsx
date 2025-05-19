@@ -39,9 +39,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
+    <div className="flex flex-col min-h-screen bg-black text-white">
       <AppHeader />
-      <main className={`flex-grow ${isDashboard ? 'p-0' : 'container mx-auto px-4 py-8 md:py-12'} pb-20`}>
+      <main className={`flex-grow ${isDashboard ? 'p-0' : 'container mx-auto px-4 pt-2 pb-20'}`}>
         {children}
       </main>
       <MobileBottomNav />
