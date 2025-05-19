@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -19,9 +20,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
   const { token, user } = useAuth();
@@ -35,11 +35,48 @@ export default function DashboardPage() {
     enabled: !!token && !!user,
   });
 
-  const { data: expiringWarranties, isLoading: isLoadingExpiring } = useQuery<Warranty[], Error>({
+  const { data: expiringWarranties, isLoading: isLoadingExpiring, error: expiringWarrantiesError } = useQuery<Warranty[], Error>({
     queryKey: ['expiringWarranties', user?._id],
     queryFn: () => apiClient<Warranty[]>('/warranties/expiring', { token }),
     enabled: !!token && !!user,
   });
+
+  useEffect(() => {
+    if (expiringWarranties && expiringWarranties.length > 0 && !isLoadingExpiring && !expiringWarrantiesError) {
+      const expiringProductNames = expiringWarranties.map(w => w.productName).slice(0, 2).join(', ');
+      const additionalItemsCount = expiringWarranties.length - 2;
+      let description = `Your warranty for ${expiringProductNames}`;
+      if (expiringWarranties.length === 1) {
+        description = `Your warranty for ${expiringWarranties[0].productName}`;
+      }
+      
+      if (additionalItemsCount > 0) {
+        description += ` and ${additionalItemsCount} other item(s) are expiring soon.`;
+      } else if (expiringWarranties.length > 1) {
+        description += ` are expiring soon.`;
+      } else {
+         description += ` is expiring soon.`;
+      }
+      
+      description += ' Check the "Expiring Soon" section for details.';
+
+      // Check if a similar toast was shown recently to avoid spamming
+      const lastShownKey = `expiringToastLastShown_${user?._id}`;
+      const lastShownTimestamp = sessionStorage.getItem(lastShownKey);
+      const now = Date.now();
+      const oneHour = 60 * 60 * 1000;
+
+      if (!lastShownTimestamp || (now - parseInt(lastShownTimestamp, 10) > oneHour)) {
+        toast({
+          title: 'Expiring Warranties Alert!',
+          description: description,
+          variant: 'default', 
+          duration: 10000, 
+        });
+        sessionStorage.setItem(lastShownKey, now.toString());
+      }
+    }
+  }, [expiringWarranties, isLoadingExpiring, expiringWarrantiesError, toast, user?._id]);
 
   const deleteMutation = useMutation<void, Error, string>({
     mutationFn: (warrantyId: string) => apiClient(`/warranties/${warrantyId}`, { method: 'DELETE', token }),
@@ -78,13 +115,17 @@ export default function DashboardPage() {
     );
   }
 
-  if (warrantiesError) {
+  if (warrantiesError || expiringWarrantiesError) {
+    const errorToShow = warrantiesError || expiringWarrantiesError;
     return (
       <div className="text-center py-10">
         <ShieldX className="mx-auto h-16 w-16 text-destructive mb-4" />
-        <h2 className="text-2xl font-semibold mb-2">Error Loading Warranties</h2>
-        <p className="text-muted-foreground mb-4">{warrantiesError.message}</p>
-        <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['warranties', user?._id] })}>
+        <h2 className="text-2xl font-semibold mb-2">Error Loading Data</h2>
+        <p className="text-muted-foreground mb-4">{errorToShow?.message}</p>
+        <Button onClick={() => {
+          queryClient.invalidateQueries({ queryKey: ['warranties', user?._id] });
+          queryClient.invalidateQueries({ queryKey: ['expiringWarranties', user?._id] });
+        }}>
           Try Again
         </Button>
       </div>
@@ -110,9 +151,6 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-semibold mb-4 flex items-center">
             <AlertTriangle className="mr-2 h-6 w-6 text-destructive" /> Expiring Soon
           </h2>
-          {expiringWarranties.length === 0 && !isLoadingExpiring && (
-            <p className="text-muted-foreground">No warranties expiring soon. Great job!</p>
-          )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {expiringWarranties.map((warranty) => (
               <WarrantyCard key={warranty._id} warranty={warranty} onDelete={() => setWarrantyToDelete(warranty._id)} />
@@ -120,6 +158,14 @@ export default function DashboardPage() {
           </div>
         </section>
       )}
+       {expiringWarranties && expiringWarranties.length === 0 && !isLoadingExpiring && (
+          <div className="text-center py-6 border-2 border-dashed border-muted-foreground/20 rounded-lg bg-card">
+            <ShieldCheck className="mx-auto h-10 w-10 text-green-500 mb-3" />
+            <h3 className="text-lg font-medium">All Clear!</h3>
+            <p className="text-sm text-muted-foreground">You have no warranties expiring soon.</p>
+          </div>
+        )}
+
 
       <section>
         <h2 className="text-2xl font-semibold mb-4">All Active Warranties</h2>
@@ -170,3 +216,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
