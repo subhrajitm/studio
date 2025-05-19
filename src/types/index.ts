@@ -81,6 +81,7 @@ export interface ProfileFormValues {
   username: string;
   email: string;
   profilePictureFile?: File | null;
+  notificationsEnabled: boolean;
 }
 
 // AI Flow Types
