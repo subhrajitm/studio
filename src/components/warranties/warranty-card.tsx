@@ -59,10 +59,10 @@ export function WarrantyCard({ warranty, onDelete }: WarrantyCardProps) {
   return (
     <Card className={cardClasses}>
       <CardHeader className="px-4 py-3">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-semibold mb-0.5">{warranty.productName}</CardTitle>
+        <div className="flex justify-between items-start gap-2">
+          <CardTitle className="text-lg font-semibold mb-0.5 flex-1 min-w-0 truncate" title={warranty.productName}>{warranty.productName}</CardTitle>
           {expiryStatus !== 'unknown' && (
-             <Badge variant={getExpiryBadgeVariant()} className="ml-2 shrink-0">
+             <Badge variant={getExpiryBadgeVariant()} className="ml-auto shrink-0"> {/* Use ml-auto to push badge to the right if productName is short */}
                {expiryStatus === 'expiring-soon' && <AlertTriangle className="h-3 w-3 mr-1" />}
                {getExpiryBadgeText()}
              </Badge>
@@ -99,7 +99,7 @@ export function WarrantyCard({ warranty, onDelete }: WarrantyCardProps) {
         {warranty.notes && (
            <div className="flex items-start">
             <StickyNote className="h-3.5 w-3.5 mr-1.5 text-primary shrink-0 mt-0.5" />
-            <span className="truncate">Notes: {warranty.notes}</span>
+            <p className="truncate">Notes: <span className="font-normal text-muted-foreground">{warranty.notes}</span></p>
           </div>
         )}
       </CardContent>
@@ -114,7 +114,7 @@ export function WarrantyCard({ warranty, onDelete }: WarrantyCardProps) {
           </Button>
           {warranty.documentUrl && (
             <Button variant="ghost" size="sm" asChild>
-              <a href={warranty.documentUrl} target="_blank" rel="noopener noreferrer">
+              <a href={`https://warrityweb-api-x1ev.onrender.com${warranty.documentUrl}`} target="_blank" rel="noopener noreferrer" title="View warranty document">
                 <FileText className="h-4 w-4 md:mr-1.5" />
                  <span className="hidden md:inline">Document</span>
                  <span className="md:hidden">Doc</span>
