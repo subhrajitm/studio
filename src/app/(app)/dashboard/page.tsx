@@ -139,7 +139,7 @@ export default function DashboardPage() {
   
   const activeWarranties = warranties?.filter(w => !expiringWarranties?.find(ew => ew._id === w._id));
   const showExpiringSectionContent = expiringWarranties && expiringWarranties.length > 0;
-  const showAllClearMessage = expiringWarranties && expiringWarenties.length === 0 && !isLoadingExpiring;
+  const showAllClearMessage = expiringWarranties && expiringWarranties.length === 0 && !isLoadingExpiring;
   const showActiveWarrantiesContent = activeWarranties && activeWarranties.length > 0;
 
   return (
