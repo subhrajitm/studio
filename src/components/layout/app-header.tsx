@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -13,9 +14,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { usePathname } from 'next/navigation';
 
 export function AppHeader() {
   const { user, logout, isAuthenticated } = useAuth();
+  const pathname = usePathname();
+  const isDashboard = pathname === '/dashboard';
 
   const getInitials = (name?: string) => {
     if (!name) return 'U';
@@ -28,17 +32,23 @@ export function AppHeader() {
 
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
-        <Link href="/dashboard" className="flex items-center space-x-2">
-          <ShieldCheck className="h-8 w-8 text-primary" />
-          <span className="font-bold text-xl sm:inline-block">Warranty Wallet</span>
-        </Link>
+    <header className={isDashboard ? "md:hidden sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" : "sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"}>
+      {/* On dashboard, this header is effectively hidden on md+ screens by AppLayout, and on mobile, it's minimal. */}
+      {/* For other pages, it shows fully. */}
+      <div className="container flex h-14 items-center justify-between max-w-screen-2xl">
+        {!isDashboard && (
+          <Link href={isAuthenticated ? "/dashboard" : "/login"} className="flex items-center space-x-2">
+            <ShieldCheck className="h-7 w-7 text-primary" />
+            <span className="font-bold text-lg sm:inline-block">Warranty Wallet</span>
+          </Link>
+        )}
+        {/* Spacer to push avatar to the right if logo is hidden on dashboard */}
+        {isDashboard && <div className="flex-1"></div>}
         
         {isAuthenticated && user && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+              <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-9 w-9">
                    <AvatarImage 
                     src={user.profilePicture ? `${API_BASE_URL_FOR_FILES}${user.profilePicture}` : undefined} 
@@ -72,6 +82,11 @@ export function AppHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        )}
+         {!isAuthenticated && !isDashboard && (
+            <Button asChild variant="outline" size="sm">
+                <Link href="/login">Login</Link>
+            </Button>
         )}
       </div>
     </header>

@@ -8,6 +8,56 @@ body {
 
 @layer base {
   :root {
+    /* Dark Theme with Green Accent (Inspired by Splitz design) */
+    --background: 200 25% 12%; /* Dark bluish-grey */
+    --foreground: 200 10% 90%; /* Light grey/off-white */
+
+    --card: 200 25% 18%; /* Slightly lighter dark bluish-grey for cards */
+    --card-foreground: 200 10% 90%;
+
+    --popover: 200 25% 15%;
+    --popover-foreground: 200 10% 90%;
+
+    --primary: 100 70% 50%; /* Bright Green */
+    --primary-foreground: 200 25% 10%; /* Dark text for contrast on green */
+
+    --secondary: 200 20% 25%; /* Medium bluish-grey */
+    --secondary-foreground: 200 10% 85%;
+
+    --muted: 200 20% 22%; /* Muted bluish-grey */
+    --muted-foreground: 200 10% 60%; /* Muted text */
+
+    --accent: 100 70% 55%; /* Slightly lighter green for accents if needed */
+    --accent-foreground: 200 25% 10%;
+
+    --destructive: 0 70% 55%; /* Red for destructive actions */
+    --destructive-foreground: 0 0% 100%; /* White text on red */
+
+    --border: 200 20% 25%; /* Border for cards/inputs */
+    --input: 200 20% 25%; /* Input background / border */
+    --ring: 100 70% 55%; /* Green for focus rings */
+
+    --chart-1: 100 70% 50%;
+    --chart-2: 120 60% 45%;
+    --chart-3: 180 50% 40%;
+    --chart-4: 80 65% 60%;
+    --chart-5: 90 75% 55%;
+
+    --radius: 0.5rem;
+
+    /* Sidebar specific colors - adjust if sidebar is used extensively with this theme */
+    --sidebar-background: 200 25% 15%;
+    --sidebar-foreground: 200 10% 85%;
+    --sidebar-primary: 100 70% 50%;
+    --sidebar-primary-foreground: 200 25% 10%;
+    --sidebar-accent: 200 20% 30%;
+    --sidebar-accent-foreground: 200 10% 90%;
+    --sidebar-border: 200 20% 25%;
+    --sidebar-ring: 100 70% 55%;
+  }
+
+  /* Fallback light theme (original theme) if .dark class is NOT applied */
+  .light {
     --background: 40 40% 97%; /* Very light warm beige (#F9F7F5) */
     --foreground: 20 20% 20%; /* Dark warm grey (#3D3835) */
     --card: 0 0% 100%; /* White */
@@ -32,9 +82,7 @@ body {
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-
-    /* Sidebar specific colors - can be adjusted if sidebar is used extensively */
+    
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -42,43 +90,6 @@ body {
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 30 8% 10%; /* Very dark warm grey (#1C1A19) */
-    --foreground: 30 10% 95%; /* Off-white text (#F3F2F1) */
-    --card: 30 8% 13%; /* Dark card background (#252221) */
-    --card-foreground: 30 10% 95%;
-    --popover: 30 8% 13%;
-    --popover-foreground: 30 10% 95%;
-    --primary: 30 90% 55%; /* Slightly lighter orange for dark mode (#F57E24) */
-    --primary-foreground: 0 0% 100%; /* White */
-    --secondary: 30 8% 20%; /* (#373331) */
-    --secondary-foreground: 30 10% 95%;
-    --muted: 30 8% 18%; /* (#312E2C) */
-    --muted-foreground: 30 10% 70%; /* (#B8B5B2) */
-    --accent: 30 90% 55%; /* Orange */
-    --accent-foreground: 0 0% 100%; /* White */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 30 8% 25%; /* (#46413E) */
-    --input: 30 8% 25%;
-    --ring: 30 90% 55%; /* Orange for focus rings */
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-
-    /* Sidebar specific colors for dark mode */
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }

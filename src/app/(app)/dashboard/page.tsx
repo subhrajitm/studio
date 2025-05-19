@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/auth-context';
 import apiClient from '@/lib/api-client';
 import type { Warranty } from '@/types';
-import { WarrantyCard } from '@/components/warranties/warranty-card';
+import { WarrantyListItem } from '@/components/warranties/warranty-list-item'; // New compact list item
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { PlusCircle, AlertTriangle, Loader2, ShieldX, Info, ShieldCheck } from 'lucide-react';
+import { PlusCircle, AlertTriangle, List, UserCircle, Settings, ShieldX, Loader2, ShieldCheck, Info, Zap } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -21,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent } from '@/components/ui/card';
 import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
@@ -30,20 +30,25 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const [warrantyToDelete, setWarrantyToDelete] = useState<string | null>(null);
 
-  const { data: warranties, isLoading: isLoadingWarranties, error: warrantiesError } = useQuery<Warranty[], Error>({
-    queryKey: ['warranties', user?._id],
-    queryFn: () => apiClient<Warranty[]>('/warranties', { token }),
+  const { data: warrantiesData, isLoading: isLoadingWarranties, error: warrantiesError } = useQuery<{ warranties: Warranty[], expiringWarranties: Warranty[] }, Error>({
+    queryKey: ['dashboardData', user?._id],
+    queryFn: async () => {
+      if (!token || !user) throw new Error("User not authenticated");
+      const [warranties, expiringWarranties] = await Promise.all([
+        apiClient<Warranty[]>('/warranties', { token }),
+        apiClient<Warranty[]>('/warranties/expiring', { token })
+      ]);
+      return { warranties, expiringWarranties };
+    },
     enabled: !!token && !!user,
   });
 
-  const { data: expiringWarranties, isLoading: isLoadingExpiring, error: expiringWarrantiesError } = useQuery<Warranty[], Error>({
-    queryKey: ['expiringWarranties', user?._id],
-    queryFn: () => apiClient<Warranty[]>('/warranties/expiring', { token }),
-    enabled: !!token && !!user,
-  });
+  const warranties = warrantiesData?.warranties;
+  const expiringWarranties = warrantiesData?.expiringWarranties;
+  const isLoadingExpiring = isLoadingWarranties; // Both loaded together
 
   useEffect(() => {
-    if (expiringWarranties && expiringWarranties.length > 0 && !isLoadingExpiring && !expiringWarrantiesError) {
+    if (expiringWarranties && expiringWarranties.length > 0 && !isLoadingExpiring && !warrantiesError) {
       const expiringProductNames = expiringWarranties.map(w => w.productName).slice(0, 2).join(', ');
       const additionalItemsCount = expiringWarranties.length - 2;
       let description = `Your warranty for ${expiringProductNames}`;
@@ -59,8 +64,6 @@ export default function DashboardPage() {
          description += ` is expiring soon.`;
       }
       
-      description += ' Check the "Expiring Soon" section for details.';
-
       const lastShownKey = `expiringToastLastShown_${user?._id}`;
       const lastShownTimestamp = sessionStorage.getItem(lastShownKey);
       const now = Date.now();
@@ -68,7 +71,7 @@ export default function DashboardPage() {
 
       if (!lastShownTimestamp || (now - parseInt(lastShownTimestamp, 10) > oneHour)) {
         toast({
-          title: 'Expiring Warranties Alert!',
+          title: 'Expiring Warranties!',
           description: description,
           variant: 'default', 
           duration: 10000, 
@@ -76,13 +79,12 @@ export default function DashboardPage() {
         sessionStorage.setItem(lastShownKey, now.toString());
       }
     }
-  }, [expiringWarranties, isLoadingExpiring, expiringWarrantiesError, toast, user?._id]);
+  }, [expiringWarranties, isLoadingExpiring, warrantiesError, toast, user?._id]);
 
   const deleteMutation = useMutation<void, Error, string>({
     mutationFn: (warrantyId: string) => apiClient(`/warranties/${warrantyId}`, { method: 'DELETE', token }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['warranties', user?._id] });
-      queryClient.invalidateQueries({ queryKey: ['expiringWarranties', user?._id] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardData', user?._id] });
       toast({ title: 'Success', description: 'Warranty deleted successfully.' });
       setWarrantyToDelete(null);
     },
@@ -95,106 +97,149 @@ export default function DashboardPage() {
   const handleDeleteWarranty = (id: string) => {
     deleteMutation.mutate(id);
   };
+  
+  const activeWarranties = warranties?.filter(w => !expiringWarranties?.find(ew => ew._id === w._id) && differenceInDays(parseISO(w.warrantyEndDate!), new Date()) >= 0);
 
-  if (isLoadingWarranties || isLoadingExpiring) {
+
+  if (isLoadingWarranties) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-6 p-4">
+        {/* Header Skeleton */}
         <div className="flex justify-between items-center mb-6">
-          <Skeleton className="h-9 w-56" />
-          <Skeleton className="h-11 w-44" />
+          <div>
+            <Skeleton className="h-6 w-32 mb-1" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </div>
+        {/* Stats Card Skeleton */}
+        <Skeleton className="h-40 rounded-xl bg-primary/30" />
+        {/* Action Buttons Skeleton */}
+        <div className="grid grid-cols-4 gap-3 mt-[-2rem] px-4 relative z-10">
+          {[1,2,3,4].map(i => <Skeleton key={i} className="h-20 rounded-lg" />)}
+        </div>
+        {/* Lists Skeleton */}
+        <div>
+          <Skeleton className="h-6 w-36 mb-3" />
+          <Skeleton className="h-16 rounded-lg mb-2" />
+          <Skeleton className="h-16 rounded-lg mb-2" />
         </div>
         <div>
-          <Skeleton className="h-8 w-48 mb-4" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-52 rounded-lg" />)}
-          </div>
-        </div>
-        <Skeleton className="h-px w-full my-8" />
-        <div>
-          <Skeleton className="h-8 w-64 mb-4" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1,2].map((i) => <Skeleton key={i} className="h-52 rounded-lg" />)}
-          </div>
+          <Skeleton className="h-6 w-48 mb-3" />
+          <Skeleton className="h-16 rounded-lg mb-2" />
         </div>
       </div>
     );
   }
 
-  if (warrantiesError || expiringWarrantiesError) {
-    const errorToShow = warrantiesError || expiringWarrantiesError;
+  if (warrantiesError) {
     return (
-      <div className="text-center py-10">
+      <div className="text-center py-10 px-4">
         <ShieldX className="mx-auto h-16 w-16 text-destructive mb-4" />
-        <h2 className="text-2xl font-semibold mb-2">Error Loading Data</h2>
-        <p className="text-muted-foreground mb-4">{errorToShow?.message}</p>
-        <Button onClick={() => {
-          queryClient.invalidateQueries({ queryKey: ['warranties', user?._id] });
-          queryClient.invalidateQueries({ queryKey: ['expiringWarranties', user?._id] });
-        }}>
+        <h2 className="text-2xl font-semibold text-foreground mb-2">Error Loading Data</h2>
+        <p className="text-muted-foreground mb-4">{warrantiesError?.message}</p>
+        <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['dashboardData', user?._id] })}>
           Try Again
         </Button>
       </div>
     );
   }
-  
-  const activeWarranties = warranties?.filter(w => !expiringWarranties?.find(ew => ew._id === w._id));
+
   const showExpiringSectionContent = expiringWarranties && expiringWarranties.length > 0;
   const showAllClearMessage = expiringWarranties && expiringWarranties.length === 0 && !isLoadingExpiring;
-  const showActiveWarrantiesContent = activeWarranties && activeWarranties.length > 0;
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">Your Warranties</h1>
-        <Button asChild size="lg">
-          <Link href="/warranties/add">
-            <PlusCircle className="mr-2 h-5 w-5" /> Add New Warranty
+    <div className="space-y-6 pb-24"> {/* Added pb-24 for bottom nav */}
+      {/* Dashboard Header */}
+      <div className="flex justify-between items-center p-4 pt-6">
+        <div>
+          <h1 className="text-xl font-semibold text-foreground">Hey, {user?.username || 'User'}!</h1>
+          <p className="text-sm text-muted-foreground">Welcome back</p>
+        </div>
+        <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-primary">
+          <Link href="/profile">
+            <Settings className="h-5 w-5" />
           </Link>
         </Button>
       </div>
 
-      { (showExpiringSectionContent || showAllClearMessage) && (
-        <section>
-          <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-border/60 flex items-center">
-            <AlertTriangle className="mr-2 h-6 w-6 text-primary" /> Expiring Soon
+      {/* Key Stats Card */}
+      <Card className="mx-4 rounded-xl bg-primary text-primary-foreground shadow-xl">
+        <CardContent className="p-5">
+          <p className="text-sm opacity-80">Total Active Warranties</p>
+          <p className="text-3xl font-bold mt-1">
+            {activeWarranties?.length || 0}
+          </p>
+          <p className="text-sm opacity-80 mt-3">Expiring Soon (30 days)</p>
+          <p className="text-lg font-semibold">
+            {expiringWarranties?.length || 0}
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Action Buttons - slightly overlapping the card from below */}
+      <div className="grid grid-cols-4 gap-x-3 gap-y-2 -mt-5 px-4 relative z-10">
+        {[
+          { label: 'Add New', icon: PlusCircle, href: '/warranties/add', color: 'bg-card text-foreground hover:bg-muted' },
+          { label: 'Expiring', icon: AlertTriangle, href: '#expiring-soon', color: 'bg-card text-foreground hover:bg-muted' },
+          { label: 'All Items', icon: List, href: '#all-active', color: 'bg-card text-foreground hover:bg-muted' },
+          { label: 'Profile', icon: UserCircle, href: '/profile', color: 'bg-card text-foreground hover:bg-muted' },
+        ].map(action => (
+          <Link key={action.label} href={action.href} passHref>
+            <Button
+              variant="default"
+              className={`flex flex-col items-center justify-center h-20 w-full p-2 rounded-lg shadow-md ${action.color} transition-transform hover:scale-105`}
+              aria-label={action.label}
+            >
+              <action.icon className="h-6 w-6 mb-1" />
+              <span className="text-xs text-center">{action.label}</span>
+            </Button>
+          </Link>
+        ))}
+      </div>
+      
+      {/* Expiring Soon Section */}
+      {(showExpiringSectionContent || showAllClearMessage) && (
+        <section className="px-4 pt-4" id="expiring-soon">
+          <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+            <Zap className="mr-2 h-5 w-5 text-primary" /> Expiring Soon
           </h2>
           {showExpiringSectionContent && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {expiringWarranties.map((warranty) => (
-                <WarrantyCard key={warranty._id} warranty={warranty} onDelete={() => setWarrantyToDelete(warranty._id)} />
+            <div className="space-y-0">
+              {expiringWarranties?.map((warranty) => (
+                <WarrantyListItem key={warranty._id} warranty={warranty} />
               ))}
             </div>
           )}
           {showAllClearMessage && (
-            <div className="text-center py-8 border-2 border-dashed border-muted rounded-lg bg-card">
-              <ShieldCheck className="mx-auto h-12 w-12 text-green-500 mb-4" />
-              <h3 className="text-xl font-semibold">All Clear!</h3>
-              <p className="text-muted-foreground">You have no warranties expiring soon.</p>
+            <div className="text-center py-8 my-4 bg-card rounded-lg">
+              <ShieldCheck className="mx-auto h-12 w-12 text-primary mb-3" />
+              <h3 className="text-md font-semibold text-foreground">All Clear!</h3>
+              <p className="text-xs text-muted-foreground">No warranties expiring in the next 30 days.</p>
             </div>
           )}
         </section>
       )}
       
-      { (showExpiringSectionContent || showAllClearMessage) && showActiveWarrantiesContent && <Separator className="my-8" /> }
-
-      <section>
-        <h2 className="text-2xl font-semibold mb-4 pb-2 border-b border-border/60">All Active Warranties</h2>
+      {/* All Active Warranties Section */}
+      <section className="px-4" id="all-active">
+        <h2 className="text-lg font-semibold text-foreground mb-3">All Active Warranties</h2>
         {(!activeWarranties || activeWarranties.length === 0) && !isLoadingWarranties && (
-           <div className="text-center py-12 border-2 border-dashed border-muted rounded-lg bg-card">
-            <Info className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No Active Warranties Yet</h3>
-            <p className="text-muted-foreground mb-6">Looks like your warranty list is empty. Add your first one!</p>
-            <Button asChild size="lg">
+           <div className="text-center py-10 my-4 bg-card rounded-lg">
+            <Info className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+            <h3 className="text-md font-semibold text-foreground mb-1">No Active Warranties</h3>
+            <p className="text-xs text-muted-foreground mb-4">Add your first warranty to get started!</p>
+            <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
               <Link href="/warranties/add">
-                <PlusCircle className="mr-2 h-5 w-5" /> Add Your First Warranty
+                <PlusCircle className="mr-2 h-4 w-4" /> Add First Warranty
               </Link>
             </Button>
           </div>
         )}
-        {showActiveWarrantiesContent && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {activeWarranties && activeWarranties.length > 0 && (
+            <div className="space-y-0">
             {activeWarranties.map((warranty) => (
-              <WarrantyCard key={warranty._id} warranty={warranty} onDelete={() => setWarrantyToDelete(warranty._id)} />
+              <WarrantyListItem key={warranty._id} warranty={warranty} />
             ))}
           </div>
         )}
