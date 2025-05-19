@@ -185,43 +185,7 @@ export function ProfileForm() {
         </div>
       </div>
 
-      {/* User Profile Header */}
-      <div className="mb-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-          <div className="relative">
-            <Avatar className="h-24 w-24 border-4 border-background shadow-md">
-              <AvatarImage src={profilePicPreview || undefined} alt={user.username} />
-              <AvatarFallback className="text-2xl bg-primary/20">{getInitials(user.username)}</AvatarFallback>
-            </Avatar>
-            <div className="absolute -bottom-2 -right-2">
-              <Button asChild variant="outline" size="icon" className="rounded-full h-8 w-8 bg-background shadow-md hover:bg-primary hover:text-primary-foreground">
-                <label htmlFor="profilePictureFile" className="cursor-pointer flex items-center justify-center">
-                  <UploadCloud className="h-4 w-4" />
-                  <Input id="profilePictureFile" type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
-                </label>
-              </Button>
-            </div>
-          </div>
-          
-          <div className="flex-1 text-center sm:text-left">
-            <h2 className="text-2xl font-bold">{user.username}</h2>
-            <p className="text-sm text-muted-foreground flex items-center justify-center sm:justify-start">
-              <Mail className="h-3 w-3 mr-1" />
-              {user.email}
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2 justify-center sm:justify-start">
-              <Badge variant="outline" className="bg-primary/10 text-xs">
-                <Bell className="h-3 w-3 mr-1" />
-                Member for {accountAge} days
-              </Badge>
-              <Badge variant="outline" className="bg-primary/10 text-xs">
-                <Shield className="h-3 w-3 mr-1" />
-                {user.role || 'User'}
-              </Badge>
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       {/* Tabs navigation */}
       <div className="mb-4">

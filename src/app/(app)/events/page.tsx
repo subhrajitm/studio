@@ -74,7 +74,7 @@ export default function EventsPage() {
   };
 
   // Filter events based on search query and selected tab
-  const filteredEvents = events?.filter(event => {
+  const filteredEvents = Array.isArray(events) ? events.filter(event => {
     const matchesSearch = searchQuery === "" || 
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -91,7 +91,7 @@ export default function EventsPage() {
       default:
         return true; // "all" tab
     }
-  });
+  }) : [];
 
   const getEventTypeColor = (type: string) => {
     switch (type?.toLowerCase()) {
