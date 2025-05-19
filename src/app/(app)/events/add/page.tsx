@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
@@ -20,6 +21,7 @@ const eventSchema = z.object({
   description: z.string().min(1, { message: "Description is required" }),
   date: z.string().min(1, { message: "Date is required" }),
   time: z.string().min(1, { message: "Time is required" }),
+  type: z.string().min(1, { message: "Event type is required" }),
 });
 
 type EventFormValues = z.infer<typeof eventSchema>;
@@ -37,6 +39,7 @@ export default function AddEventPage() {
       description: "",
       date: new Date().toISOString().split('T')[0], // Default to today's date
       time: "12:00",
+      type: "personal", // Default event type
     },
   });
 
@@ -133,6 +136,33 @@ export default function AddEventPage() {
                         {...field} 
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Event Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select event type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="personal">Personal</SelectItem>
+                        <SelectItem value="work">Work</SelectItem>
+                        <SelectItem value="social">Social</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

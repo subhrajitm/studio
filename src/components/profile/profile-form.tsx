@@ -6,14 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context';
 import type { User, ProfileFormValues } from '@/types';
 import apiClient from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, UploadCloud, User as UserIcon, Mail, Shield, Clock } from 'lucide-react';
+import { Loader2, UploadCloud, User as UserIcon, Mail, Shield, Bell, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -99,49 +98,47 @@ export function ProfileForm() {
         toast({ title: "Success", description: "Profile picture updated." });
       }
 
-      // Prepare update data based on active tab
       let updateMessage = "Profile updated successfully.";
       let updateData: any = {};
       
       if (activeTab === "profile") {
         updateData = { username: values.username, email: values.email };
-        updateMessage = "Profile information updated successfully.";
       } else if (activeTab === "notifications") {
-        updateData = { 
-          notificationsPreferences: { emailNotifications: values.notificationsEnabled }
-        };
-        updateMessage = "Notification preferences updated successfully.";
+        updateData = { notificationsEnabled: values.notificationsEnabled };
+        updateMessage = "Notification preferences updated.";
       }
 
-      // Update user details
-      const updatedUser = await apiClient<User>(`/users/${user._id}`, {
-        method: 'PUT',
-        data: updateData,
-        token,
-      });
+      // Update user profile
+      if (Object.keys(updateData).length > 0) {
+        const updateResponse = await apiClient<User>(`/users/${user._id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(updateData),
+          token,
+        });
+        updateUserInContext(updateResponse);
+        toast({ title: "Success", description: updateMessage });
+      }
 
-      updateUserInContext(updatedUser);
-      await fetchUserProfile();
-      
-      toast({ title: "Success", description: updateMessage });
-      form.reset(values);
+      setIsSubmitting(false);
     } catch (error) {
-      toast({ title: "Update Failed", description: (error as Error).message, variant: "destructive" });
-    } finally {
+      console.error('Error updating profile:', error);
+      toast({ 
+        title: "Error", 
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive"
+      });
       setIsSubmitting(false);
     }
   };
 
   if (!user) {
     return (
-      <Card className="w-full max-w-3xl mx-auto shadow-md">
-        <CardContent className="py-10">
-          <div className="flex justify-center items-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="ml-2 text-muted-foreground">Loading profile...</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="w-full max-w-3xl mx-auto">
+        <div className="flex justify-center items-center h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="ml-2 text-muted-foreground">Loading profile...</p>
+        </div>
+      </div>
     );
   }
 
@@ -151,6 +148,43 @@ export function ProfileForm() {
 
   return (
     <div className="w-full max-w-3xl mx-auto">
+      {/* Profile header with avatar and stats */}
+      <div className="mb-4 bg-gray-900 rounded-xl p-4">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Avatar className="h-16 w-16 border-2 border-lime-300 shadow-md">
+              <AvatarImage src={profilePicPreview || undefined} alt={user?.username} />
+              <AvatarFallback className="text-lg bg-gray-800 text-white">{getInitials(user?.username)}</AvatarFallback>
+            </Avatar>
+            <label 
+              htmlFor="profile-picture" 
+              className="absolute -bottom-1 -right-1 bg-lime-300 text-black h-6 w-6 rounded-full flex items-center justify-center cursor-pointer hover:bg-lime-400 transition-colors shadow-sm"
+            >
+              <UploadCloud className="h-3 w-3" />
+            </label>
+            <Input 
+              id="profile-picture" 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              onChange={handleFileChange}
+            />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-lg font-bold">{user?.username || 'User'}</h2>
+            <p className="text-xs text-gray-400">{user?.email || 'email@example.com'}</p>
+            <div className="flex gap-2 mt-1">
+              <Badge variant="outline" className="text-xs bg-gray-800 text-gray-300 border-gray-700">
+                {user?.role || 'user'}
+              </Badge>
+              <Badge variant="outline" className="text-xs bg-gray-800 text-gray-300 border-gray-700">
+                Joined {user?.createdAt ? format(new Date(user.createdAt), 'MMM yyyy') : 'N/A'}
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* User Profile Header */}
       <div className="mb-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
@@ -177,7 +211,7 @@ export function ProfileForm() {
             </p>
             <div className="mt-2 flex flex-wrap gap-2 justify-center sm:justify-start">
               <Badge variant="outline" className="bg-primary/10 text-xs">
-                <Clock className="h-3 w-3 mr-1" />
+                <Bell className="h-3 w-3 mr-1" />
                 Member for {accountAge} days
               </Badge>
               <Badge variant="outline" className="bg-primary/10 text-xs">
@@ -189,184 +223,189 @@ export function ProfileForm() {
         </div>
       </div>
 
-      {/* Tabs Interface */}
-      <Tabs defaultValue="profile" className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-3 mb-6">
-          <TabsTrigger value="profile" className="flex items-center">
-            <UserIcon className="h-4 w-4 mr-2" />
-            Profile
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center">
-            <Mail className="h-4 w-4 mr-2" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center">
-            <Shield className="h-4 w-4 mr-2" />
-            Security
-          </TabsTrigger>
-        </TabsList>
+      {/* Tabs navigation */}
+      <div className="mb-4">
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="w-full grid grid-cols-3 bg-gray-800 border border-gray-700">
+            <TabsTrigger value="profile" className="data-[state=active]:bg-lime-300 data-[state=active]:text-black">
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="data-[state=active]:bg-lime-300 data-[state=active]:text-black">
+              Notifications
+            </TabsTrigger>
+            <TabsTrigger value="security" className="data-[state=active]:bg-lime-300 data-[state=active]:text-black">
+              Security
+            </TabsTrigger>
+          </TabsList>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <TabsContent value="profile" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Personal Information</CardTitle>
-                  <CardDescription>Update your personal details here.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              {/* Profile tab */}
+              <TabsContent value="profile" className="mt-4">
+                <div className="bg-gray-900 rounded-xl p-4 space-y-4">
+                  <div className="grid gap-4">
                     <FormField
                       control={form.control}
                       name="username"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Username</FormLabel>
+                          <FormLabel className="text-gray-300 text-sm">Username</FormLabel>
                           <FormControl>
-                            <Input placeholder="Your username" {...field} />
+                            <div className="relative">
+                              <UserIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+                              <Input 
+                                placeholder="Your username" 
+                                className="pl-9 bg-gray-800 border-gray-700 focus:border-lime-300 text-white" 
+                                {...field} 
+                              />
+                            </div>
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-red-400 text-xs" />
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={form.control}
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel className="text-gray-300 text-sm">Email</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="you@example.com" {...field} />
+                            <div className="relative">
+                              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+                              <Input 
+                                placeholder="Your email" 
+                                className="pl-9 bg-gray-800 border-gray-700 focus:border-lime-300 text-white" 
+                                {...field} 
+                              />
+                            </div>
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-red-400 text-xs" />
                         </FormItem>
                       )}
                     />
                   </div>
-                </CardContent>
-                <CardFooter className="flex justify-between border-t pt-5">
-                  <Button variant="outline" type="button">Cancel</Button>
-                  <Button type="submit" disabled={isSubmitting || !form.formState.isDirty}>
-                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Save Changes
-                  </Button>
-                </CardFooter>
-              </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Account Information</CardTitle>
-                  <CardDescription>View your account details.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex justify-between py-2 border-b">
-                      <span className="text-sm font-medium">Account ID</span>
-                      <span className="text-sm text-muted-foreground">{user._id}</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b">
-                      <span className="text-sm font-medium">Created On</span>
-                      <span className="text-sm text-muted-foreground">{user.createdAt ? format(new Date(user.createdAt), 'PPP') : 'N/A'}</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b">
-                      <span className="text-sm font-medium">Last Updated</span>
-                      <span className="text-sm text-muted-foreground">{user.updatedAt ? format(new Date(user.updatedAt), 'PPP') : 'N/A'}</span>
-                    </div>
-                    <div className="flex justify-between py-2">
-                      <span className="text-sm font-medium">Account Status</span>
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Active</Badge>
-                    </div>
+                  <div className="pt-4 border-t border-gray-800 flex justify-end gap-2">
+                    <Button 
+                      variant="outline" 
+                      type="button" 
+                      onClick={() => form.reset()} 
+                      className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                    >
+                      Reset
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      disabled={isSubmitting || !form.formState.isDirty}
+                      className="bg-lime-300 text-black hover:bg-lime-400"
+                    >
+                      {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Save Changes
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                </div>
+              </TabsContent>
 
-            <TabsContent value="notifications" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Notification Preferences</CardTitle>
-                  <CardDescription>Manage how you receive notifications.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
+              {/* Notifications tab */}
+              <TabsContent value="notifications" className="mt-4">
+                <div className="bg-gray-900 rounded-xl p-4 space-y-4">
                   <FormField
                     control={form.control}
                     name="notificationsEnabled"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between py-3 border-b">
+                      <FormItem className="flex flex-row items-center justify-between py-3 border-b border-gray-800">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base">Email Notifications</FormLabel>
-                          <FormDescription className="text-xs text-muted-foreground">
-                            Receive notifications about warranty expirations via email
+                          <FormLabel className="text-white text-sm">Email Notifications</FormLabel>
+                          <FormDescription className="text-xs text-gray-400">
+                            Receive notifications about warranty expirations
                           </FormDescription>
                         </div>
                         <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="data-[state=checked]:bg-lime-300 data-[state=checked]:text-black"
                           />
                         </FormControl>
                       </FormItem>
                     )}
                   />
-                  <div className="flex items-center justify-between py-3 border-b">
+                  <div className="flex items-center justify-between py-3 border-b border-gray-800">
                     <div className="space-y-0.5">
-                      <span className="text-base font-medium">Warranty Expiration Alerts</span>
-                      <p className="text-xs text-muted-foreground">
+                      <span className="text-sm text-white">Warranty Expiration Alerts</span>
+                      <p className="text-xs text-gray-400">
                         Get notified when warranties are about to expire
                       </p>
                     </div>
-                    <Switch checked={true} disabled />
+                    <Switch checked={true} disabled className="data-[state=checked]:bg-lime-300 data-[state=checked]:text-black" />
                   </div>
                   <div className="flex items-center justify-between py-3">
                     <div className="space-y-0.5">
-                      <span className="text-base font-medium">Marketing Emails</span>
-                      <p className="text-xs text-muted-foreground">
+                      <span className="text-sm text-white">Marketing Emails</span>
+                      <p className="text-xs text-gray-400">
                         Receive emails about new features and promotions
                       </p>
                     </div>
                     <Switch checked={false} disabled />
                   </div>
-                </CardContent>
-                <CardFooter className="flex justify-between border-t pt-5">
-                  <Button variant="outline" type="button">Cancel</Button>
-                  <Button type="submit" disabled={isSubmitting || !form.formState.isDirty}>
-                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Save Preferences
-                  </Button>
-                </CardFooter>
-              </Card>
-            </TabsContent>
 
-            <TabsContent value="security" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Security Settings</CardTitle>
-                  <CardDescription>Manage your account security.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="p-4 border rounded-md">
-                      <h3 className="font-medium mb-2">Password Management</h3>
-                      <p className="text-sm text-muted-foreground mb-4">Your password should be at least 8 characters and include a mix of letters, numbers, and symbols.</p>
-                      <Button variant="outline" disabled>Change Password</Button>
-                    </div>
-                    <div className="p-4 border rounded-md">
-                      <h3 className="font-medium mb-2">Two-Factor Authentication</h3>
-                      <p className="text-sm text-muted-foreground mb-4">Add an extra layer of security to your account by enabling two-factor authentication.</p>
-                      <Button variant="outline" disabled>Enable 2FA</Button>
-                    </div>
-                    <div className="p-4 border rounded-md">
-                      <h3 className="font-medium mb-2">Active Sessions</h3>
-                      <p className="text-sm text-muted-foreground mb-4">You are currently logged in from this device.</p>
-                      <Button variant="destructive" disabled>Sign Out All Devices</Button>
-                    </div>
+                  <div className="pt-4 border-t border-gray-800 flex justify-end gap-2">
+                    <Button 
+                      type="submit" 
+                      disabled={isSubmitting || !form.formState.isDirty}
+                      className="bg-lime-300 text-black hover:bg-lime-400"
+                    >
+                      {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Save Preferences
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </form>
-        </Form>
-      </Tabs>
+                </div>
+              </TabsContent>
+
+              {/* Security tab */}
+              <TabsContent value="security" className="mt-4">
+                <div className="bg-gray-900 rounded-xl p-4 space-y-4">
+                  <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
+                    <h3 className="text-sm font-medium text-white mb-1">Password Management</h3>
+                    <p className="text-xs text-gray-400 mb-3">Your password should be at least 8 characters and include a mix of letters, numbers, and symbols.</p>
+                    <Button 
+                      variant="outline" 
+                      disabled 
+                      className="text-xs h-8 border-gray-700 text-gray-300"
+                    >
+                      Change Password
+                    </Button>
+                  </div>
+                  <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
+                    <h3 className="text-sm font-medium text-white mb-1">Two-Factor Authentication</h3>
+                    <p className="text-xs text-gray-400 mb-3">Add an extra layer of security to your account by enabling two-factor authentication.</p>
+                    <Button 
+                      variant="outline" 
+                      disabled 
+                      className="text-xs h-8 border-gray-700 text-gray-300"
+                    >
+                      Enable 2FA
+                    </Button>
+                  </div>
+                  <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
+                    <h3 className="text-sm font-medium text-white mb-1">Active Sessions</h3>
+                    <p className="text-xs text-gray-400 mb-3">You are currently logged in from this device.</p>
+                    <Button 
+                      variant="destructive" 
+                      disabled 
+                      className="text-xs h-8 bg-red-600 hover:bg-red-700"
+                    >
+                      Sign Out All Devices
+                    </Button>
+                  </div>
+                </div>
+              </TabsContent>
+            </form>
+          </Form>
+        </Tabs>
+      </div>
     </div>
   );
 }
