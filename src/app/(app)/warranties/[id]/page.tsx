@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useParams, useRouter } from 'next/navigation';
@@ -16,7 +17,7 @@ export default function EditWarrantyPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
-  const { token } = useAuth();
+  const { token, user } = useAuth(); // Added user here
   const queryClient = useQueryClient();
 
   const { data: warranty, isLoading, error } = useQuery<Warranty, Error>({
@@ -26,9 +27,8 @@ export default function EditWarrantyPage() {
   });
 
   const handleSuccess = () => {
-    queryClient.invalidateQueries({ queryKey: ['warranties'] }); // Invalidate list
-    queryClient.invalidateQueries({ queryKey: ['warranty', id] }); // Invalidate this item
-    queryClient.invalidateQueries({queryKey: ['expiringWarranties']});
+    queryClient.invalidateQueries({ queryKey: ['dashboardData', user?._id] }); // Specific invalidation for dashboard
+    queryClient.invalidateQueries({ queryKey: ['warranty', id] }); // Invalidate this specific item
     router.push('/dashboard');
   };
   

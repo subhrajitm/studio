@@ -15,6 +15,8 @@ interface WarrantyCardProps {
   onDelete?: (id: string) => void;
 }
 
+const API_BASE_URL_FOR_FILES = 'https://warrityweb-api-x1ev.onrender.com';
+
 export function WarrantyCard({ warranty, onDelete }: WarrantyCardProps) {
   const purchaseDate = isValid(parseISO(warranty.purchaseDate)) ? format(parseISO(warranty.purchaseDate), 'MMM dd, yyyy') : 'N/A';
   const warrantyEndDate = warranty.warrantyEndDate && isValid(parseISO(warranty.warrantyEndDate)) ? format(parseISO(warranty.warrantyEndDate), 'MMM dd, yyyy') : 'N/A';
@@ -114,7 +116,7 @@ export function WarrantyCard({ warranty, onDelete }: WarrantyCardProps) {
           </Button>
           {warranty.documentUrl && (
             <Button variant="ghost" size="sm" asChild>
-              <a href={`https://warrityweb-api-x1ev.onrender.com${warranty.documentUrl}`} target="_blank" rel="noopener noreferrer" title="View warranty document">
+              <a href={`${API_BASE_URL_FOR_FILES}${warranty.documentUrl}`} target="_blank" rel="noopener noreferrer" title="View warranty document">
                 <FileText className="h-4 w-4 md:mr-1.5" />
                  <span className="hidden md:inline">Document</span>
                  <span className="md:hidden">Doc</span>
