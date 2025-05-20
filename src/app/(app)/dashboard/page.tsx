@@ -8,7 +8,7 @@ import type { Warranty } from '@/types';
 import { WarrantyListItem } from '@/components/warranties/warranty-list-item';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { PlusCircle, AlertTriangle, List, UserCircle, Settings, ShieldX, Loader2, ShieldCheck, Info, Zap, FileText, ShoppingBag, Wrench, Calendar, Bell, Home, Grid3X3 } from 'lucide-react';
+import { PlusCircle, AlertTriangle, List, ShieldX, Loader2, ShieldCheck, Info, Zap, FileText, ShoppingBag, Wrench, Calendar, Bell, TrendingUp, Clock, DollarSign, BarChart3 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -49,6 +49,42 @@ export default function DashboardPage() {
   const warranties = warrantiesData?.warranties;
   const expiringWarranties = warrantiesData?.expiringWarranties;
   const isLoadingExpiring = isLoadingWarranties; 
+
+  const stats = (() => {
+    if (!warranties) return {
+      totalWarranties: 0,
+      totalValue: 0,
+      avgWarrantyLength: 0,
+      topCategories: [],
+      expiringCount: 0
+    };
+    
+    const totalWarranties = warranties.length;
+    const totalValue = warranties.reduce((sum, w) => sum + (w.purchasePrice || 0), 0);
+    const avgWarrantyLength = Math.round(
+      warranties.reduce((sum, w) => sum + w.warrantyLength, 0) / totalWarranties || 0
+    );
+    
+    // Group warranties by category
+    const categoryCounts: Record<string, number> = {};
+    warranties.forEach(w => {
+      const category = w.category || 'Uncategorized';
+      categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+    });
+    
+    // Find top categories
+    const topCategories = Object.entries(categoryCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+      
+    return {
+      totalWarranties,
+      totalValue,
+      avgWarrantyLength,
+      topCategories,
+      expiringCount: expiringWarranties?.length || 0
+    };
+  })();
 
   useEffect(() => {
     if (expiringWarranties && expiringWarranties.length > 0 && !isLoadingExpiring && !warrantiesError) {
@@ -163,108 +199,98 @@ export default function DashboardPage() {
     { label: 'All Items', icon: List, href: '#all-active' },
   ];
 
-  const menuCards = [
-    { href: '/warranties', label: 'Warranties', icon: ShieldCheck, color: 'from-green-500 to-emerald-700', description: 'Manage all your product warranties' },
-    { href: '/products', label: 'Products', icon: ShoppingBag, color: 'from-blue-500 to-indigo-700', description: 'Browse and find product information' },
-    { href: '/service', label: 'Service', icon: Wrench, color: 'from-amber-500 to-orange-700', description: 'Find service providers for your products' },
-    { href: '/calendar', label: 'Calendar', icon: Calendar, color: 'from-purple-500 to-violet-700', description: 'Track important warranty dates' },
-    { href: '/profile', label: 'Profile', icon: UserCircle, color: 'from-rose-500 to-pink-700', description: 'Manage your account settings' },
-    { href: '/notifications', label: 'Notifications', icon: Bell, color: 'from-cyan-500 to-teal-700', description: 'View your alerts and notifications' },
-  ];
-
-  const quickActions = [
-    { href: '/warranties/new', label: 'Add Warranty', icon: PlusCircle },
-    { href: '/dashboard', label: 'Dashboard', icon: Grid3X3 },
-    { href: '/settings', label: 'Settings', icon: Settings },
-  ];
-
   return (
-    <div className="space-y-6 pb-24">
-      {/* Compact Dashboard Header */}
-      <div className="px-4 pt-3">
-        <div className="bg-gradient-to-r from-lime-400 to-lime-300 rounded-lg p-2.5 shadow-sm">
-          <h1 className="text-base font-bold text-black">Hey, {user?.username || 'User'}!</h1>
-        </div>
-      </div>
-
-      {/* Ultra Compact Menu Grid */}
-      <div className="px-4 pt-2">
-        <div className="grid grid-cols-3 gap-2 mb-3">
-          {menuCards.map((card) => (
-            <Link href={card.href} key={card.label}>
-              <div className={`bg-gradient-to-br ${card.color} rounded-lg p-2 shadow-sm flex flex-col items-center justify-center h-20`}>
-                <card.icon className="h-4 w-4 text-white mb-1" />
-                <span className="text-xs font-medium text-white">{card.label}</span>
-              </div>
-            </Link>
-          ))}
-        </div>
+    <div className="pb-20">
+      {/* Dashboard Header */}
+      <div className="px-4 py-2 flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Link href="/warranties/add">
+            <PlusCircle className="mr-2 h-4 w-4" /> Add Warranty
+          </Link>
+        </Button>
       </div>
       
-      {/* Key Stats Cards */}
-      <div className="flex space-x-3 mx-4">
-        {/* Total Active Warranties Card */}
-        <Card className="flex-1 rounded-lg bg-gradient-to-r from-primary/90 to-primary text-primary-foreground shadow-md overflow-hidden relative">
-          <div className="absolute top-0 right-0 opacity-5">
-            <ShieldCheck className="h-20 w-20 -mt-2 -mr-2" />
-          </div>
-          <CardContent className="p-3 flex items-center">
-            <div className="bg-white/10 rounded-full p-2 mr-3">
-              <ShieldCheck className="h-4 w-4" />
-            </div>
-            <div>
-              <div className="flex items-baseline space-x-1">
-                <span className="text-2xl font-bold">{activeWarranties?.length || 0}</span>
-                <span className="text-xs font-medium opacity-80">active</span>
+      {/* Stats Overview */}
+      {stats && (
+        <div className="grid grid-cols-2 gap-3 p-4">
+          {/* Total Warranties */}
+          <Card className="bg-gradient-to-br from-lime-500/20 to-lime-600/10 border-lime-500/20">
+            <CardContent className="p-4 flex items-center">
+              <ShieldCheck className="h-8 w-8 mr-3 text-lime-500" />
+              <div>
+                <p className="text-xs text-muted-foreground">Total Warranties</p>
+                <h3 className="text-2xl font-bold">{stats.totalWarranties}</h3>
               </div>
-              {warranties && warranties.length > 0 && (
-                <p className="text-[10px] opacity-70 mt-0.5">{warranties.length} items protected</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Expiring Soon Card */}
-        <Card className="flex-1 rounded-lg bg-gradient-to-r from-amber-500/90 to-amber-500 text-white shadow-md overflow-hidden relative">
-          <div className="absolute top-0 right-0 opacity-5">
-            <Zap className="h-20 w-20 -mt-2 -mr-2" />
-          </div>
-          <CardContent className="p-3 flex items-center">
-            <div className="bg-white/10 rounded-full p-2 mr-3">
-              <Zap className="h-4 w-4" />
-            </div>
-            <div>
-              <div className="flex items-baseline space-x-1">
-                <span className="text-2xl font-bold">{expiringWarranties?.length || 0}</span>
-                <span className="text-xs font-medium opacity-80">expiring</span>
+            </CardContent>
+          </Card>
+          
+          {/* Expiring Soon */}
+          <Card className="bg-gradient-to-br from-amber-500/20 to-amber-600/10 border-amber-500/20">
+            <CardContent className="p-4 flex items-center">
+              <Clock className="h-8 w-8 mr-3 text-amber-500" />
+              <div>
+                <p className="text-xs text-muted-foreground">Expiring Soon</p>
+                <h3 className="text-2xl font-bold">{stats.expiringCount}</h3>
               </div>
-              {expiringWarranties && expiringWarranties.length > 0 ? (
-                <p className="text-[10px] opacity-70 mt-0.5">
-                  Next: {expiringWarranties[0]?.warrantyEndDate ? 
-                    `${differenceInDays(parseISO(expiringWarranties[0].warrantyEndDate), new Date())} days` : 'N/A'}
-                </p>
-              ) : (
-                <p className="text-[10px] opacity-70 mt-0.5">Next 30 days</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Action Buttons - slightly overlapping the card from below */}
-      <div className="grid grid-cols-4 gap-x-3 gap-y-2 -mt-5 px-4 relative z-10">
-        {dashboardActions.map(action => (
-          <Link key={action.label} href={action.href} passHref>
-            <Button
-              className="flex flex-col items-center justify-center h-20 w-full p-2 rounded-lg shadow-md bg-card text-foreground transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl hover:bg-muted group"
-              aria-label={action.label}
-            >
-              <action.icon className="h-6 w-6 mb-1 text-muted-foreground group-hover:text-primary transition-colors" />
-              <span className="text-xs text-center text-muted-foreground group-hover:text-foreground transition-colors">{action.label}</span>
-            </Button>
-          </Link>
-        ))}
-      </div>
+            </CardContent>
+          </Card>
+          
+          {/* Total Value */}
+          <Card className="bg-gradient-to-br from-blue-500/20 to-blue-600/10 border-blue-500/20">
+            <CardContent className="p-4 flex items-center">
+              <DollarSign className="h-8 w-8 mr-3 text-blue-500" />
+              <div>
+                <p className="text-xs text-muted-foreground">Total Value</p>
+                <h3 className="text-2xl font-bold">${stats.totalValue.toLocaleString()}</h3>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Avg. Warranty Length */}
+          <Card className="bg-gradient-to-br from-purple-500/20 to-purple-600/10 border-purple-500/20">
+            <CardContent className="p-4 flex items-center">
+              <TrendingUp className="h-8 w-8 mr-3 text-purple-500" />
+              <div>
+                <p className="text-xs text-muted-foreground">Avg. Warranty Length</p>
+                <h3 className="text-2xl font-bold">{stats.avgWarrantyLength} months</h3>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      
+      {/* Category Breakdown */}
+      {stats && stats.topCategories.length > 0 && (
+        <div className="px-4 pt-2 pb-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold flex items-center">
+                  <BarChart3 className="h-5 w-5 mr-2 text-primary" /> 
+                  Top Categories
+                </h3>
+              </div>
+              <div className="space-y-3">
+                {stats.topCategories.map(([category, count]) => (
+                  <div key={category} className="flex items-center justify-between">
+                    <span className="text-sm">{category}</span>
+                    <div className="flex items-center">
+                      <span className="text-sm font-medium mr-2">{count}</span>
+                      <div className="h-2 bg-primary/20 rounded-full w-24 overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full" 
+                          style={{ width: `${(count / stats.totalWarranties) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
       
       {/* Expiring Soon Section */}
       {(showExpiringSectionContent || showAllClearMessage) && (
