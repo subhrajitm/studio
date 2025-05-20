@@ -52,7 +52,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
       queryParams.append('sort', sort);
       
       const response = await apiClient<{ products: Product[], total: number, pages: number }>(
-        `/api/products?${queryParams.toString()}`,
+        `/products?${queryParams.toString()}`,
         token ? { token } : {}
       );
       
@@ -75,14 +75,23 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     
     try {
       const response = await apiClient<{ categories: string[] }>(
-        '/api/products/categories',
+        '/products/categories',
         token ? { token } : {}
       );
       
-      setCategories(response.categories);
+      // Check if response has categories and it's an array
+      if (response && response.categories && Array.isArray(response.categories)) {
+        setCategories(response.categories);
+      } else {
+        // Fallback to default categories if API response is invalid
+        console.warn('Invalid categories response, using fallback categories');
+        setCategories(['Electronics', 'Home Appliances', 'Audio']);
+      }
     } catch (err) {
       console.error('Error fetching product categories:', err);
-      setError('Failed to fetch product categories. Please try again later.');
+      // Set fallback categories on error
+      setCategories(['Electronics', 'Home Appliances', 'Audio']);
+      setError('Failed to fetch product categories. Using default categories.');
     } finally {
       setIsLoading(false);
     }
@@ -95,7 +104,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     
     try {
       const product = await apiClient<Product>(
-        `/api/products/${id}`,
+        `/products/${id}`,
         token ? { token } : {}
       );
       

@@ -104,10 +104,7 @@ export function Sidebar() {
 
   const SidebarContent = () => (
     <div className="flex h-full flex-col">
-      <div className="px-3 py-4">
-        <h2 className="mb-4 px-4 text-lg font-semibold tracking-tight text-lime-400 border-b border-gray-800 pb-2">
-          Warranty Manager
-        </h2>
+      <div className="px-3 py-2">
         <div className="space-y-1">
           {navItems.map((item) => (
             <div key={item.href} className="space-y-1">
@@ -116,12 +113,12 @@ export function Sidebar() {
                   <Button
                     variant="ghost"
                     className={cn(
-                      "w-full justify-start text-white hover:bg-gray-800",
-                      isActive(item.href) && "bg-gray-800 text-lime-400"
+                      "w-full justify-start text-white hover:bg-gray-800 rounded-md mb-1 transition-colors",
+                      isActive(item.href) && "bg-gray-800 text-lime-400 font-medium"
                     )}
                     onClick={() => toggleItem(item.href)}
                   >
-                    <item.icon className="mr-2 h-4 w-4" />
+                    <item.icon className="mr-3 h-4 w-4" />
                     {item.label}
                     <ChevronRight 
                       className={cn(
@@ -135,11 +132,11 @@ export function Sidebar() {
                     <Button
                       variant="ghost"
                       className={cn(
-                        "w-full justify-start text-white hover:bg-gray-800",
-                        isActive(item.href) && "bg-gray-800 text-lime-400"
+                        "w-full justify-start text-white hover:bg-gray-800 rounded-md mb-1 transition-colors",
+                        isActive(item.href) && "bg-gray-800 text-lime-400 font-medium"
                       )}
                     >
-                      <item.icon className="mr-2 h-4 w-4" />
+                      <item.icon className="mr-3 h-4 w-4" />
                       {item.label}
                     </Button>
                   </Link>
@@ -153,8 +150,8 @@ export function Sidebar() {
                       <Button
                         variant="ghost"
                         className={cn(
-                          "w-full justify-start pl-6 text-gray-300 hover:bg-gray-800",
-                          pathname === subItem.href && "bg-gray-800 text-lime-400"
+                          "w-full justify-start pl-7 text-gray-300 hover:bg-gray-800 rounded-md text-sm transition-colors",
+                          pathname === subItem.href && "bg-gray-800 text-lime-400 font-medium"
                         )}
                       >
                         {subItem.label}
@@ -173,8 +170,16 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden border-r bg-black text-white h-screen w-64 fixed left-0 top-0 lg:block z-50">
-        <ScrollArea className="h-full">
+      <aside className="hidden border-r border-gray-800 bg-black text-white h-screen w-64 fixed left-0 top-0 lg:block z-50">
+        <div className="p-2 flex items-center border-b border-gray-800">
+          <div className="h-7 w-7 rounded-md bg-gradient-to-br from-lime-400 to-lime-600 flex items-center justify-center mr-2">
+            <ShieldCheck className="h-4 w-4 text-black" />
+          </div>
+          <h2 className="text-lg font-bold tracking-tight text-white">
+            <span className="text-lime-400">War</span>rity
+          </h2>
+        </div>
+        <ScrollArea className="h-[calc(100vh-44px)]">
           <SidebarContent />
         </ScrollArea>
       </aside>
@@ -191,18 +196,28 @@ export function Sidebar() {
         />
         
         {/* Sidebar */}
-        <div className="fixed inset-y-0 left-0 w-64 bg-black border-r border-gray-800 overflow-auto">
-          <div className="flex justify-end p-4">
+        <div className="fixed inset-y-0 left-0 w-64 bg-black border-r border-gray-800 overflow-hidden">
+          <div className="flex justify-between items-center p-2 border-b border-gray-800">
+            <div className="flex items-center">
+              <div className="h-7 w-7 rounded-md bg-gradient-to-br from-lime-400 to-lime-600 flex items-center justify-center mr-2">
+                <ShieldCheck className="h-4 w-4 text-black" />
+              </div>
+              <h2 className="text-lg font-bold tracking-tight text-white">
+                <span className="text-lime-400">War</span>rity
+              </h2>
+            </div>
             <Button 
               variant="ghost" 
               size="icon" 
               className="text-white hover:bg-gray-800"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </Button>
           </div>
-          <SidebarContent />
+          <div className="overflow-auto h-[calc(100vh-44px)]">
+            <SidebarContent />
+          </div>
         </div>
       </div>
     </>

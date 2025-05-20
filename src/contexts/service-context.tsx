@@ -123,7 +123,7 @@ export const ServiceProvider: React.FC<{ children: ReactNode }> = ({ children })
       queryParams.append('sort', sort);
       
       const response = await apiClient<{ serviceInfo: ServiceInfo[], total: number, pages: number }>(
-        `/api/service-info/user?${queryParams.toString()}`,
+        `/service-info/user?${queryParams.toString()}`,
         { token }
       );
       
@@ -146,7 +146,7 @@ export const ServiceProvider: React.FC<{ children: ReactNode }> = ({ children })
     
     try {
       const serviceInfo = await apiClient<ProductServiceInfo>(
-        `/api/service-info/product/${productId}`,
+        `/service-info/product/${productId}`,
         token ? { token } : {}
       );
       
@@ -168,7 +168,7 @@ export const ServiceProvider: React.FC<{ children: ReactNode }> = ({ children })
     
     try {
       const serviceInfo = await apiClient<CompanyServiceInfo>(
-        `/api/service-info/company/${encodeURIComponent(company)}`,
+        `/service-info/company/${encodeURIComponent(company)}`,
         token ? { token } : {}
       );
       

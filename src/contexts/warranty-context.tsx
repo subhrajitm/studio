@@ -60,7 +60,7 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
       if (status) queryParams.append('status', status);
       
       const response = await apiClient<{ warranties: Warranty[], total: number, pages: number }>(
-        `/api/warranties?${queryParams.toString()}`,
+        `/warranties?${queryParams.toString()}`,
         { token }
       );
       
@@ -88,7 +88,7 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     try {
       const response = await apiClient<{ warranties: Warranty[], total: number }>(
-        `/api/warranties/expiring?days=${days}`,
+        `/warranties/expiring?days=${days}`,
         { token }
       );
       
@@ -113,7 +113,7 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     try {
       const warranty = await apiClient<Warranty>(
-        `/api/warranties/${id}`,
+        `/warranties/${id}`,
         { token }
       );
       
@@ -138,7 +138,7 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     try {
       const newWarranty = await apiClient<Warranty>(
-        '/api/warranties',
+        '/warranties',
         { 
           method: 'POST',
           data: warrantyData,
@@ -171,7 +171,7 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     try {
       const updatedWarranty = await apiClient<Warranty>(
-        `/api/warranties/${id}`,
+        `/warranties/${id}`,
         { 
           method: 'PUT',
           data: warrantyData,
@@ -215,7 +215,7 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     try {
       await apiClient(
-        `/api/warranties/${id}`,
+        `/warranties/${id}`,
         { 
           method: 'DELETE',
           token 
