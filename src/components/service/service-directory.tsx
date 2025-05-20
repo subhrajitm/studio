@@ -25,8 +25,8 @@ const ServiceDirectory = () => {
   const { toast } = useToast();
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedServiceType, setSelectedServiceType] = useState('');
-  const [selectedCompany, setSelectedCompany] = useState('');
+  const [selectedServiceType, setSelectedServiceType] = useState('all-service-types');
+  const [selectedCompany, setSelectedCompany] = useState('all-companies');
   const [sortOption, setSortOption] = useState('nameAsc');
   const [companies, setCompanies] = useState<string[]>([]);
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
@@ -34,17 +34,26 @@ const ServiceDirectory = () => {
   // Handle search
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchServiceInfo(1, 10, searchTerm, selectedServiceType, selectedCompany, sortOption);
+    // Convert special values to empty strings for API
+    const serviceType = selectedServiceType === 'all-service-types' ? '' : selectedServiceType;
+    const company = selectedCompany === 'all-companies' ? '' : selectedCompany;
+    fetchServiceInfo(1, 10, searchTerm, serviceType, company, sortOption);
   };
   
   // Handle pagination
   const handlePageChange = (page: number) => {
-    fetchServiceInfo(page, 10, searchTerm, selectedServiceType, selectedCompany, sortOption);
+    // Convert special values to empty strings for API
+    const serviceType = selectedServiceType === 'all-service-types' ? '' : selectedServiceType;
+    const company = selectedCompany === 'all-companies' ? '' : selectedCompany;
+    fetchServiceInfo(page, 10, searchTerm, serviceType, company, sortOption);
   };
   
   // Handle filter change
   const handleFilterChange = () => {
-    fetchServiceInfo(1, 10, searchTerm, selectedServiceType, selectedCompany, sortOption);
+    // Convert special values to empty strings for API
+    const serviceType = selectedServiceType === 'all-service-types' ? '' : selectedServiceType;
+    const company = selectedCompany === 'all-companies' ? '' : selectedCompany;
+    fetchServiceInfo(1, 10, searchTerm, serviceType, company, sortOption);
   };
   
   // Extract unique companies and service types from service info
@@ -112,7 +121,7 @@ const ServiceDirectory = () => {
                   <SelectValue placeholder="All Service Types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Service Types</SelectItem>
+                  <SelectItem value="all-service-types">All Service Types</SelectItem>
                   {serviceTypes.map((type) => (
                     <SelectItem key={type} value={type}>
                       {type}
@@ -132,7 +141,7 @@ const ServiceDirectory = () => {
                   <SelectValue placeholder="All Companies" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Companies</SelectItem>
+                  <SelectItem value="all-companies">All Companies</SelectItem>
                   {companies.map((company) => (
                     <SelectItem key={company} value={company}>
                       {company}
