@@ -3,7 +3,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { UserCircle, LogOut, Settings } from 'lucide-react'; 
+import { UserCircle, LogOut, Settings, Menu } from 'lucide-react'; 
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +22,13 @@ export function AppHeader() {
   const pathname = usePathname();
   const isDashboard = pathname === '/dashboard';
   const pageName = getPageName(pathname);
+  
+  // Function to toggle the mobile sidebar
+  const toggleMobileSidebar = () => {
+    // Using a custom event to communicate with the sidebar component
+    const event = new CustomEvent('toggle-sidebar');
+    document.dispatchEvent(event);
+  };
 
   // Get current time for status bar
   const [currentTime, setCurrentTime] = React.useState(() => {
@@ -63,7 +70,7 @@ export function AppHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-lime-400 to-lime-300 shadow-md">
+    <header className="sticky top-0 z-40 w-full bg-gradient-to-r from-lime-400 to-lime-300 shadow-md">
       {/* Status bar with realistic mockup */}
       <div className="flex justify-between px-4 py-1 text-xs font-medium text-black bg-black/5">
         <div>{currentTime}</div>
@@ -86,21 +93,22 @@ export function AppHeader() {
       </div>
       
       {/* Main header content */}
-      <div className="container flex items-center justify-between max-w-screen-2xl px-4 py-2">
-        {/* Back button with improved shadow */}
-        <div className="flex items-center">
-          {!isDashboard && (
-            <Link href="/dashboard" className="flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                <path d="m15 18-6-6 6-6"/>
-              </svg>
-            </Link>
-          )}
-        </div>
-        
-        {/* Page title with better typography */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 text-black font-semibold text-sm uppercase tracking-wide">
-          {pageName}
+      <div className="flex items-center justify-between px-4 py-2">
+        {/* Sidebar toggle button (visible on all screen sizes) */}
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-black hover:bg-lime-500/20" 
+            onClick={toggleMobileSidebar}
+            aria-label="Open sidebar menu"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          {/* Page title with better typography */}
+          <div className="text-black font-semibold text-sm uppercase tracking-wide">
+            {pageName}
+          </div>
         </div>
         
         {/* User avatar with improved styling */}

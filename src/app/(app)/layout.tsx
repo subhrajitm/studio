@@ -5,8 +5,10 @@ import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
+import { SidebarProvider } from '@/contexts/sidebar-context';
 import { AppHeader } from '@/components/layout/app-header';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
+import { Sidebar } from '@/components/layout/sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
@@ -39,12 +41,17 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-white">
-      <AppHeader />
-      <main className={`flex-grow ${isDashboard ? 'p-0' : 'container mx-auto px-4 pt-2 pb-20'}`}>
-        {children}
-      </main>
-      <MobileBottomNav />
-    </div>
+    <SidebarProvider>
+      <div className="flex min-h-screen bg-black text-white">
+        <Sidebar />
+        <div className="flex flex-col flex-1 lg:pl-64 w-full">
+          <AppHeader />
+          <main className={`flex-grow ${isDashboard ? 'p-0' : 'px-4 pt-4 pb-20 max-w-7xl mx-auto w-full'}`}>
+            {children}
+          </main>
+          <MobileBottomNav />
+        </div>
+      </div>
+    </SidebarProvider>
   );
 }
