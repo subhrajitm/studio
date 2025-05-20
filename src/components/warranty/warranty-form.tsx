@@ -269,10 +269,12 @@ const WarrantyForm: React.FC<WarrantyFormProps> = ({ initialData, isEditing = fa
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
                         <FormLabel>Purchase Date*</FormLabel>
-                        <DatePicker
-                          date={field.value}
-                          setDate={field.onChange}
-                        />
+                        <FormControl>
+                          <DatePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -284,10 +286,12 @@ const WarrantyForm: React.FC<WarrantyFormProps> = ({ initialData, isEditing = fa
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
                         <FormLabel>Expiry Date*</FormLabel>
-                        <DatePicker
-                          date={field.value}
-                          setDate={field.onChange}
-                        />
+                        <FormControl>
+                          <DatePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
