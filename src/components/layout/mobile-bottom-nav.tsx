@@ -52,10 +52,9 @@ export function MobileBottomNav() {
           <Link
             href="/warranties/new"
             className="relative flex items-center justify-center">
-            <div className="absolute -top-3 bg-lime-400 rounded-full p-1.5 shadow-lg">
-              <Plus className="h-4 w-4 text-black" />
+            <div className="absolute -top-6 bg-lime-500 rounded-full p-3 shadow-lg border-2 border-black">
+              <Plus className="h-5 w-5 text-black font-bold" />
             </div>
-            <span className="text-[9px] font-medium mt-3 text-gray-400">Add</span>
           </Link>
         </div>
 
