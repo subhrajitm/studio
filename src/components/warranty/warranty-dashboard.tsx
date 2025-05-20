@@ -7,24 +7,61 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Pagination } from '@/components/ui/pagination';
-import { Spinner } from '@/components/ui/spinner';
+// Custom Pagination component
+const Pagination = ({ currentPage, totalPages, onPageChange }: { currentPage: number, totalPages: number, onPageChange: (page: number) => void }) => {
+  return (
+    <div className="flex items-center justify-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+        disabled={currentPage <= 1}
+      >
+        Previous
+      </Button>
+      <span className="text-sm">
+        Page {currentPage} of {totalPages}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+        disabled={currentPage >= totalPages}
+      >
+        Next
+      </Button>
+    </div>
+  );
+};
+
+// Custom Spinner component
+const Spinner = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
+  const sizeClass = {
+    sm: "h-4 w-4",
+    md: "h-8 w-8",
+    lg: "h-12 w-12"
+  }[size];
+  
+  return (
+    <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-black ${sizeClass}`}></div>
+  );
+};
 import { PlusIcon, SearchIcon, FilterIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 
 const WarrantyDashboard = () => {
   const { 
-    warranties, 
-    expiringWarranties, 
+    warranties = [], 
+    expiringWarranties = [], 
     isLoading, 
     error, 
-    totalWarranties, 
-    totalPages, 
-    currentPage,
+    totalWarranties = 0, 
+    totalPages = 0, 
+    currentPage = 1,
     fetchWarranties, 
     fetchExpiringWarranties 
-  } = useWarranty();
+  } = useWarranty() || {};
   
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();

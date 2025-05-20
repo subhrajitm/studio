@@ -59,15 +59,32 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
       if (category) queryParams.append('category', category);
       if (status) queryParams.append('status', status);
       
-      const response = await apiClient<{ warranties: Warranty[], total: number, pages: number }>(
+      // The API returns an array of warranties directly instead of an object with warranties, total, and pages properties
+      const response = await apiClient<Warranty[]>(
         `/warranties?${queryParams.toString()}`,
         { token }
       );
       
-      setWarranties(response.warranties);
-      setTotalWarranties(response.total);
-      setTotalPages(response.pages);
-      setCurrentPage(page);
+      // Check if response is an array (direct warranties data)
+      if (Array.isArray(response)) {
+        console.log('Received warranties data:', response);
+        setWarranties(response);
+        setTotalWarranties(response.length);
+        // Calculate total pages based on the number of items and limit
+        const calculatedPages = Math.ceil(response.length / limit);
+        setTotalPages(calculatedPages > 0 ? calculatedPages : 1);
+        setCurrentPage(page);
+      } else if (response && typeof response === 'object' && 'warranties' in response) {
+        // Handle legacy response format if API is updated later
+        const typedResponse = response as unknown as { warranties: Warranty[], total: number, pages: number };
+        setWarranties(typedResponse.warranties);
+        setTotalWarranties(typedResponse.total);
+        setTotalPages(typedResponse.pages);
+        setCurrentPage(page);
+      } else {
+        console.error('Unexpected API response format:', response);
+        setError('Received unexpected data format from server');
+      }
     } catch (err) {
       console.error('Error fetching warranties:', err);
       setError('Failed to fetch warranties. Please try again later.');
@@ -87,12 +104,24 @@ export const WarrantyProvider: React.FC<{ children: ReactNode }> = ({ children }
     setError(null);
     
     try {
-      const response = await apiClient<{ warranties: Warranty[], total: number }>(
+      // The API returns an array of warranties directly
+      const response = await apiClient<Warranty[]>(
         `/warranties/expiring?days=${days}`,
         { token }
       );
       
-      setExpiringWarranties(response.warranties);
+      // Check if response is an array (direct warranties data)
+      if (Array.isArray(response)) {
+        console.log('Received expiring warranties data:', response);
+        setExpiringWarranties(response);
+      } else if (response && typeof response === 'object' && 'warranties' in response) {
+        // Handle legacy response format if API is updated later
+        const typedResponse = response as unknown as { warranties: Warranty[], total: number };
+        setExpiringWarranties(typedResponse.warranties);
+      } else {
+        console.error('Unexpected API response format for expiring warranties:', response);
+        setError('Received unexpected data format from server');
+      }
     } catch (err) {
       console.error('Error fetching expiring warranties:', err);
       setError('Failed to fetch expiring warranties. Please try again later.');

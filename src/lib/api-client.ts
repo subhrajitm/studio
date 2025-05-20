@@ -1,5 +1,6 @@
 import type { ApiErrorResponse } from '@/types';
 
+// Use the external API server
 const API_BASE_URL = 'https://warrityweb-api-x1ev.onrender.com/api';
 
 interface RequestOptions extends RequestInit {
@@ -45,7 +46,8 @@ async function apiClient<T>(
     // Log the error for easier debugging
     console.error(`API Error (${response.status}) on ${endpoint}:`, errorData);
 
-    const error: ApiError = new Error(errorData.message || 'An unknown API error occurred');
+    // Create a proper ApiError object with the required properties
+    const error = new Error(errorData.message || 'An unknown API error occurred') as ApiError;
     error.status = response.status;
     error.data = errorData;
     throw error;

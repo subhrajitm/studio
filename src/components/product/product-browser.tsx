@@ -5,8 +5,44 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pagination } from '@/components/ui/pagination';
-import { Spinner } from '@/components/ui/spinner';
+// Create simple pagination and spinner components
+const Pagination = ({ currentPage, totalPages, onPageChange }: { currentPage: number, totalPages: number, onPageChange: (page: number) => void }) => {
+  return (
+    <div className="flex items-center justify-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+        disabled={currentPage <= 1}
+      >
+        Previous
+      </Button>
+      <span className="text-sm">
+        Page {currentPage} of {totalPages}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+        disabled={currentPage >= totalPages}
+      >
+        Next
+      </Button>
+    </div>
+  );
+};
+
+const Spinner = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
+  const sizeClass = {
+    sm: "h-4 w-4",
+    md: "h-8 w-8",
+    lg: "h-12 w-12"
+  }[size];
+  
+  return (
+    <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-black ${sizeClass}`}></div>
+  );
+};
 import { SearchIcon, FilterIcon, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import { Product } from '@/types';
@@ -35,31 +71,47 @@ const ProductBrowser = () => {
   const { toast } = useToast();
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedManufacturer, setSelectedManufacturer] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all-categories');
+  const [selectedManufacturer, setSelectedManufacturer] = useState('all-manufacturers');
   const [sortOption, setSortOption] = useState('nameAsc');
   const [manufacturers, setManufacturers] = useState<string[]>([]);
   
   // Handle search
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchProducts(1, 10, searchTerm, selectedCategory, selectedManufacturer, sortOption);
+    // Only pass the filters if they're not the 'all' options
+    const manufacturerFilter = selectedManufacturer === 'all-manufacturers' ? '' : selectedManufacturer;
+    const categoryFilter = selectedCategory === 'all-categories' ? '' : selectedCategory;
+    fetchProducts(1, 10, searchTerm, categoryFilter, manufacturerFilter, sortOption);
   };
   
   // Handle pagination
   const handlePageChange = (page: number) => {
-    fetchProducts(page, 10, searchTerm, selectedCategory, selectedManufacturer, sortOption);
+    // Only pass the filters if they're not the 'all' options
+    const manufacturerFilter = selectedManufacturer === 'all-manufacturers' ? '' : selectedManufacturer;
+    const categoryFilter = selectedCategory === 'all-categories' ? '' : selectedCategory;
+    fetchProducts(page, 10, searchTerm, categoryFilter, manufacturerFilter, sortOption);
   };
   
   // Handle filter change
   const handleFilterChange = () => {
-    fetchProducts(1, 10, searchTerm, selectedCategory, selectedManufacturer, sortOption);
+    // Only pass the filters if they're not the 'all' options
+    const manufacturerFilter = selectedManufacturer === 'all-manufacturers' ? '' : selectedManufacturer;
+    const categoryFilter = selectedCategory === 'all-categories' ? '' : selectedCategory;
+    fetchProducts(1, 10, searchTerm, categoryFilter, manufacturerFilter, sortOption);
   };
   
   // Extract unique manufacturers from products
   useEffect(() => {
     if (products.length > 0) {
-      const uniqueManufacturers = Array.from(new Set(products.map(product => product.manufacturer)));
+      // Filter out any null, undefined or empty string values
+      const uniqueManufacturers = Array.from(
+        new Set(
+          products
+            .map(product => product.brand)
+            .filter((brand): brand is string => !!brand && brand.trim() !== '')
+        )
+      );
       setManufacturers(uniqueManufacturers);
     }
   }, [products]);
@@ -128,7 +180,7 @@ const ProductBrowser = () => {
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all-categories">All Categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
@@ -148,7 +200,7 @@ const ProductBrowser = () => {
                   <SelectValue placeholder="All Manufacturers" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Manufacturers</SelectItem>
+                  <SelectItem value="all-manufacturers">All Manufacturers</SelectItem>
                   {manufacturers.map((manufacturer) => (
                     <SelectItem key={manufacturer} value={manufacturer}>
                       {manufacturer}
@@ -189,8 +241,8 @@ const ProductBrowser = () => {
           <p className="text-muted-foreground">No products found matching your criteria.</p>
           <Button variant="outline" className="mt-4" onClick={() => {
             setSearchTerm('');
-            setSelectedCategory('');
-            setSelectedManufacturer('');
+            setSelectedCategory('all-categories');
+            setSelectedManufacturer('all-manufacturers');
             setSortOption('nameAsc');
             fetchProducts();
           }}>
@@ -251,12 +303,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">{product.name}</CardTitle>
         <CardDescription>
-          {product.manufacturer} • {product.category}
+          {product.brand} • {product.category}
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-2 flex-grow">
+        {/* Display price if available, otherwise show a placeholder */}
         <p className="font-bold text-lg">
-          {formatPrice(product.price)}
+          {(product as any).price ? formatPrice((product as any).price) : 'Price not available'}
         </p>
         {product.description && (
           <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
