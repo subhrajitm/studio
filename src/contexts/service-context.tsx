@@ -122,6 +122,7 @@ export const ServiceProvider: React.FC<{ children: ReactNode }> = ({ children })
       if (company) queryParams.append('company', company);
       queryParams.append('sort', sort);
       
+      // Using the correct endpoint as per documentation
       const response = await apiClient<{ serviceInfo: ServiceInfo[], total: number, pages: number }>(
         `/service-info/user?${queryParams.toString()}`,
         { token }

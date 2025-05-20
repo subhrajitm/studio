@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ShieldCheck, Plus, ShoppingBag, Wrench } from 'lucide-react';
+import { Home, ShieldCheck, Plus, ShoppingBag, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItemType { 
@@ -19,7 +19,7 @@ export function MobileBottomNav() {
     { href: '/dashboard', label: 'Home', icon: Home },
     { href: '/warranties', label: 'Warranties', icon: ShieldCheck },
     { href: '/products', label: 'Products', icon: ShoppingBag },
-    { href: '/service', label: 'Service', icon: Wrench },
+    { href: '/profile', label: 'Profile', icon: User },
   ];
 
   const isActive = (href: string) => {
