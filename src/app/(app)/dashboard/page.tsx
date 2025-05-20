@@ -8,7 +8,7 @@ import type { Warranty } from '@/types';
 import { WarrantyListItem } from '@/components/warranties/warranty-list-item';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { PlusCircle, AlertTriangle, List, UserCircle, Settings, ShieldX, Loader2, ShieldCheck, Info, Zap, FileText } from 'lucide-react';
+import { PlusCircle, AlertTriangle, List, UserCircle, Settings, ShieldX, Loader2, ShieldCheck, Info, Zap, FileText, ShoppingBag, Wrench, Calendar, Bell, Home, Grid3X3 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -158,24 +158,49 @@ export default function DashboardPage() {
   const showActiveWarrantiesContent = activeWarranties && activeWarranties.length > 0;
 
   const dashboardActions = [
-    { label: 'Add New', icon: PlusCircle, href: '/warranties/add' },
+    { label: 'Add New', icon: PlusCircle, href: '/warranties/new' },
     { label: 'Expiring', icon: AlertTriangle, href: '#expiring-soon' },
     { label: 'All Items', icon: List, href: '#all-active' },
-    { label: 'Profile', icon: UserCircle, href: '/profile' },
+  ];
+
+  const menuCards = [
+    { href: '/warranties', label: 'Warranties', icon: ShieldCheck, color: 'from-green-500 to-emerald-700', description: 'Manage all your product warranties' },
+    { href: '/products', label: 'Products', icon: ShoppingBag, color: 'from-blue-500 to-indigo-700', description: 'Browse and find product information' },
+    { href: '/service', label: 'Service', icon: Wrench, color: 'from-amber-500 to-orange-700', description: 'Find service providers for your products' },
+    { href: '/calendar', label: 'Calendar', icon: Calendar, color: 'from-purple-500 to-violet-700', description: 'Track important warranty dates' },
+    { href: '/profile', label: 'Profile', icon: UserCircle, color: 'from-rose-500 to-pink-700', description: 'Manage your account settings' },
+    { href: '/notifications', label: 'Notifications', icon: Bell, color: 'from-cyan-500 to-teal-700', description: 'View your alerts and notifications' },
+  ];
+
+  const quickActions = [
+    { href: '/warranties/new', label: 'Add Warranty', icon: PlusCircle },
+    { href: '/dashboard', label: 'Dashboard', icon: Grid3X3 },
+    { href: '/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
     <div className="space-y-6 pb-24">
-      {/* Dashboard Header */}
-      <div className="flex justify-between items-start p-4 pt-6">
-        <div className="flex-1">
-          {/* Removed Warranty Wallet branding from here */}
-          <h1 className="text-2xl font-bold text-foreground">Hey, {user?.username || 'User'}!</h1>
-          <p className="text-sm text-muted-foreground">Welcome back, manage your warranties with ease.</p>
+      {/* Compact Dashboard Header */}
+      <div className="px-4 pt-3">
+        <div className="bg-gradient-to-r from-lime-400 to-lime-300 rounded-lg p-2.5 shadow-sm">
+          <h1 className="text-base font-bold text-black">Hey, {user?.username || 'User'}!</h1>
         </div>
-        {/* Removed Settings icon button from here */}
       </div>
 
+      {/* Ultra Compact Menu Grid */}
+      <div className="px-4 pt-2">
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          {menuCards.map((card) => (
+            <Link href={card.href} key={card.label}>
+              <div className={`bg-gradient-to-br ${card.color} rounded-lg p-2 shadow-sm flex flex-col items-center justify-center h-20`}>
+                <card.icon className="h-4 w-4 text-white mb-1" />
+                <span className="text-xs font-medium text-white">{card.label}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+      
       {/* Key Stats Cards */}
       <div className="flex space-x-3 mx-4">
         {/* Total Active Warranties Card */}

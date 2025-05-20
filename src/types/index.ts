@@ -14,11 +14,16 @@ export interface Warranty {
   _id: string;
   user: string; // User ID
   productName: string;
+  productBrand?: string;
+  productCategory?: string;
+  productId?: string;
   purchaseDate: string; // ISO Date string
   warrantyLength: number; // in months or a duration string
-  warrantyEndDate?: string; // ISO Date string, calculated or set
+  expiryDate: string; // ISO Date string for expiry
+  warrantyEndDate?: string; // ISO Date string, calculated or set (legacy field)
   notes?: string;
   documentUrl?: string; // URL to the uploaded document
+  warrantyImage?: string; // URL to warranty image
   category?: string;
   retailer?: string;
   purchasePrice?: number;

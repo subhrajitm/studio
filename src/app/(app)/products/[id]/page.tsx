@@ -1,18 +1,16 @@
-
 "use client";
 
-import { useParams } from 'next/navigation';
-import WarrantyDetail from '@/components/warranty/warranty-detail';
-import { WarrantyProvider } from '@/contexts/warranty-context';
-import { ServiceProvider } from '@/contexts/service-context';
-import { CalendarProvider } from '@/contexts/calendar-context';
-import { Spinner } from '@/components/ui/spinner';
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import ProductDetail from '@/components/product/product-detail';
+import { ProductProvider } from '@/contexts/product-context';
+import { ServiceProvider } from '@/contexts/service-context';
+import { WarrantyProvider } from '@/contexts/warranty-context';
+import { Spinner } from '@/components/ui/spinner';
 
-
-export default function WarrantyDetailPage() {
+export default function ProductDetailPage() {
   const params = useParams();
-  const warrantyId = params.id as string;
+  const productId = params.id as string;
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -33,12 +31,12 @@ export default function WarrantyDetailPage() {
   }
 
   return (
-    <WarrantyProvider>
+    <ProductProvider>
       <ServiceProvider>
-        <CalendarProvider>
-          <WarrantyDetail warrantyId={warrantyId} />
-        </CalendarProvider>
+        <WarrantyProvider>
+          <ProductDetail productId={productId} />
+        </WarrantyProvider>
       </ServiceProvider>
-    </WarrantyProvider>
+    </ProductProvider>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useWarranty } from '@/contexts/warranty-context';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,10 +61,10 @@ const WarrantyDashboard = () => {
     const daysRemaining = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     
     if (daysRemaining <= 30) {
-      return <Badge variant="warning">Expiring Soon</Badge>;
+      return <Badge variant="outline" className="bg-amber-100 text-amber-800 hover:bg-amber-100">Expiring Soon</Badge>;
     }
     
-    return <Badge variant="success">Active</Badge>;
+    return <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">Active</Badge>;
   };
   
   // Format date for display

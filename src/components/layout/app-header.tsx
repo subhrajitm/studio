@@ -50,9 +50,10 @@ export function AppHeader() {
   // Function to get page name from pathname
   function getPageName(path: string): string {
     if (path === '/dashboard') return 'dashboard';
-    if (path.includes('/warranties/all')) return 'leaderboards';
     if (path.includes('/warranties')) return 'warranties';
-    if (path.includes('/events')) return 'events';
+    if (path.includes('/products')) return 'products';
+    if (path.includes('/service')) return 'service';
+    if (path.includes('/calendar')) return 'calendar';
     if (path.includes('/profile')) return 'profile';
     
     // Extract the last part of the path
