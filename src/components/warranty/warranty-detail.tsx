@@ -195,13 +195,13 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
   }
   
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container mx-auto py-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <div>
-          <h1 className="text-3xl font-bold">{warranty.productName}</h1>
-          <p className="text-muted-foreground">{warranty.productBrand} • {warranty.productCategory}</p>
+          <h1 className="text-2xl font-bold">{warranty.productName}</h1>
+          <p className="text-sm text-muted-foreground">{warranty.productBrand} • {warranty.productCategory}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={createExpiryReminder}>
             <CalendarPlusIcon className="mr-2 h-4 w-4" />
             Add Reminder
@@ -238,61 +238,69 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2">
           <Tabs defaultValue="details" className="w-full">
-            <TabsList className="mb-6">
-              <TabsTrigger value="details">Warranty Details</TabsTrigger>
-              <TabsTrigger value="service">Service Information</TabsTrigger>
+            <TabsList className="mb-4">
+              <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="service">Service</TabsTrigger>
               <TabsTrigger value="documents">Documents</TabsTrigger>
             </TabsList>
             
             <TabsContent value="details">
               <Card>
-                <CardHeader>
-                  <CardTitle>Warranty Details</CardTitle>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">Warranty Details</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CardContent className="space-y-4 pt-0">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Product Information</h3>
-                      <div className="mt-2 space-y-2">
-                        <div>
-                          <span className="font-medium">Product Name:</span> {warranty.productName}
+                      <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Product Information</h3>
+                      <div className="space-y-1 text-sm">
+                        <div className="grid grid-cols-3 gap-1">
+                          <span className="font-medium">Name:</span> 
+                          <span className="col-span-2">{warranty.productName}</span>
                         </div>
-                        <div>
-                          <span className="font-medium">Brand:</span> {warranty.productBrand}
+                        <div className="grid grid-cols-3 gap-1">
+                          <span className="font-medium">Brand:</span>
+                          <span className="col-span-2">{warranty.productBrand}</span>
                         </div>
-                        <div>
-                          <span className="font-medium">Category:</span> {warranty.productCategory}
+                        <div className="grid grid-cols-3 gap-1">
+                          <span className="font-medium">Category:</span>
+                          <span className="col-span-2">{warranty.productCategory}</span>
                         </div>
                         {warranty.productModel && (
-                          <div>
-                            <span className="font-medium">Model:</span> {warranty.productModel}
+                          <div className="grid grid-cols-3 gap-1">
+                            <span className="font-medium">Model:</span>
+                            <span className="col-span-2">{warranty.productModel}</span>
                           </div>
                         )}
                         {warranty.serialNumber && (
-                          <div>
-                            <span className="font-medium">Serial Number:</span> {warranty.serialNumber}
+                          <div className="grid grid-cols-3 gap-1">
+                            <span className="font-medium">Serial #:</span>
+                            <span className="col-span-2">{warranty.serialNumber}</span>
                           </div>
                         )}
                       </div>
                     </div>
                     
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Purchase Information</h3>
-                      <div className="mt-2 space-y-2">
-                        <div>
-                          <span className="font-medium">Purchase Date:</span> {formatDate(warranty.purchaseDate)}
+                      <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Purchase Information</h3>
+                      <div className="space-y-1 text-sm">
+                        <div className="grid grid-cols-3 gap-1">
+                          <span className="font-medium">Date:</span>
+                          <span className="col-span-2">{formatDate(warranty.purchaseDate)}</span>
                         </div>
                         {warranty.retailer && (
-                          <div>
-                            <span className="font-medium">Retailer:</span> {warranty.retailer}
+                          <div className="grid grid-cols-3 gap-1">
+                            <span className="font-medium">Retailer:</span>
+                            <span className="col-span-2">{warranty.retailer}</span>
                           </div>
                         )}
                         {warranty.purchasePrice && (
-                          <div>
-                            <span className="font-medium">Purchase Price:</span> ${warranty.purchasePrice.toFixed(2)}
+                          <div className="grid grid-cols-3 gap-1">
+                            <span className="font-medium">Price:</span>
+                            <span className="col-span-2">${warranty.purchasePrice.toFixed(2)}</span>
                           </div>
                         )}
                       </div>
@@ -300,18 +308,20 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
                   </div>
                   
                   <div>
-                    <h3 className="text-sm font-medium text-muted-foreground">Warranty Information</h3>
-                    <div className="mt-2 space-y-2">
-                      <div className="flex items-center">
+                    <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Warranty Information</h3>
+                    <div className="space-y-1 text-sm">
+                      <div className="grid grid-cols-3 gap-1">
                         <span className="font-medium">Status:</span> 
-                        <span className="ml-2">{getWarrantyStatus()}</span>
+                        <span className="col-span-2">{getWarrantyStatus()}</span>
                       </div>
-                      <div>
-                        <span className="font-medium">Expiry Date:</span> {formatDate(warranty.expiryDate)}
+                      <div className="grid grid-cols-3 gap-1">
+                        <span className="font-medium">Expires:</span>
+                        <span className="col-span-2">{formatDate(warranty.expiryDate)}</span>
                       </div>
                       {warranty.warrantyProvider && (
-                        <div>
-                          <span className="font-medium">Warranty Provider:</span> {warranty.warrantyProvider}
+                        <div className="grid grid-cols-3 gap-1">
+                          <span className="font-medium">Provider:</span>
+                          <span className="col-span-2">{warranty.warrantyProvider}</span>
                         </div>
                       )}
                     </div>
@@ -319,8 +329,8 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
                   
                   {warranty.warrantyTerms && (
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Warranty Terms</h3>
-                      <div className="mt-2 p-4 bg-muted rounded-md">
+                      <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Warranty Terms</h3>
+                      <div className="p-3 bg-muted rounded-md text-sm">
                         <p className="whitespace-pre-line">{warranty.warrantyTerms}</p>
                       </div>
                     </div>
@@ -328,9 +338,9 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
                   
                   {warranty.notes && (
                     <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Additional Notes</h3>
-                      <div className="mt-2">
-                        <p className="whitespace-pre-line">{warranty.notes}</p>
+                      <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Additional Notes</h3>
+                      <div>
+                        <p className="whitespace-pre-line text-sm">{warranty.notes}</p>
                       </div>
                     </div>
                   )}
@@ -340,10 +350,10 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
             
             <TabsContent value="service">
               <Card>
-                <CardHeader>
-                  <CardTitle>Service Information</CardTitle>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">Service Information</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4 pt-0">
                   {productServiceInfo ? (
                     <div className="space-y-6">
                       {productServiceInfo.warrantyTerms && (
@@ -442,10 +452,10 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
             
             <TabsContent value="documents">
               <Card>
-                <CardHeader>
-                  <CardTitle>Documents</CardTitle>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">Documents</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4 pt-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card>
                       <CardHeader>
@@ -574,14 +584,14 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex-col space-y-2">
-              <Button className="w-full" onClick={createExpiryReminder}>
-                <CalendarIcon className="mr-2 h-4 w-4" />
+            <CardFooter className="flex-col space-y-2 pt-2">
+              <Button size="sm" className="w-full" onClick={createExpiryReminder}>
+                <CalendarIcon className="mr-2 h-3 w-3" />
                 Add to Calendar
               </Button>
               <Link href={`/warranties/${warrantyId}/edit`} className="w-full">
-                <Button variant="outline" className="w-full">
-                  <PencilIcon className="mr-2 h-4 w-4" />
+                <Button size="sm" variant="outline" className="w-full">
+                  <PencilIcon className="mr-2 h-3 w-3" />
                   Edit Warranty
                 </Button>
               </Link>
