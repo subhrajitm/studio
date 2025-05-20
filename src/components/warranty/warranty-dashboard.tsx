@@ -106,12 +106,33 @@ const WarrantyDashboard = () => {
   
   // Format date for display
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    try {
+      // Check if dateString is valid
+      if (!dateString || typeof dateString !== 'string') {
+        return 'Invalid date';
+      }
+      
+      // Validate date string format
+      if (!/^\d{4}-\d{2}-\d{2}/.test(dateString)) {
+        return 'Invalid date format';
+      }
+      
+      const date = new Date(dateString);
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'Invalid date';
+      }
+      
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error, dateString);
+      return 'Invalid date';
+    }
   };
   
   // Show error toast if there's an error
@@ -324,7 +345,23 @@ const WarrantyDashboard = () => {
                           <p><strong>Purchase Date:</strong> {formatDate(warranty.purchaseDate)}</p>
                           <p><strong>Expiry Date:</strong> {formatDate(warranty.expiryDate)}</p>
                           <p className="text-warning font-medium">
-                            Expires {formatDistanceToNow(new Date(warranty.expiryDate), { addSuffix: true })}
+                            Expires {(() => {
+                              try {
+                                // Validate the date string before creating a Date object
+                                if (!warranty.expiryDate || !/^\d{4}-\d{2}-\d{2}/.test(warranty.expiryDate)) {
+                                  return 'soon';
+                                }
+                                const expiryDate = new Date(warranty.expiryDate);
+                                // Check if the date is valid
+                                if (isNaN(expiryDate.getTime())) {
+                                  return 'soon';
+                                }
+                                return formatDistanceToNow(expiryDate, { addSuffix: true });
+                              } catch (error) {
+                                console.error('Error formatting date:', error, warranty.expiryDate);
+                                return 'soon';
+                              }
+                            })()}
                           </p>
                         </div>
                       </CardContent>
