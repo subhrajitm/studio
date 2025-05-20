@@ -36,9 +36,10 @@ export const metadata: Metadata = {
     telephone: false,
   },
   manifest: '/manifest.json', // Placeholder for PWA manifest
+  // Use inline SVG icon to avoid manifest icon errors
   icons: {
-    icon: '/icons/icon-192x192.png',
-    apple: '/icons/apple-touch-icon.png',
+    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="0.9em" font-size="90" x="50%" text-anchor="middle" dominant-baseline="middle" fill="%2362D926">W</text></svg>',
+    apple: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="0.9em" font-size="90" x="50%" text-anchor="middle" dominant-baseline="middle" fill="%2362D926">W</text></svg>',
   },
 };
 

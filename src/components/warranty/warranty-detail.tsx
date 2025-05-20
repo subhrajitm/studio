@@ -423,7 +423,7 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
                         {warranty.receiptImage ? (
                           <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
                             <img 
-                              src={warranty.receiptImage} 
+                              src={warranty.receiptImage ? `/api/proxy/${warranty.receiptImage.replace(/^https?:\/\/[^\/]+\//, '')}` : ''} 
                               alt="Receipt" 
                               className="max-h-full max-w-full object-contain"
                             />
@@ -438,7 +438,7 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
                       <CardFooter>
                         {warranty.receiptImage && (
                           <a 
-                            href={warranty.receiptImage} 
+                            href={warranty.receiptImage ? `/api/proxy/${warranty.receiptImage.replace(/^https?:\/\/[^\/]+\//, '')}` : ''} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="w-full"
@@ -459,7 +459,7 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
                         {warranty.warrantyImage ? (
                           <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
                             <img 
-                              src={warranty.warrantyImage} 
+                              src={warranty.warrantyImage ? `/api/proxy/${warranty.warrantyImage.replace(/^https?:\/\/[^\/]+\//, '')}` : ''} 
                               alt="Warranty Document" 
                               className="max-h-full max-w-full object-contain"
                             />
@@ -474,7 +474,7 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
                       <CardFooter>
                         {warranty.warrantyImage && (
                           <a 
-                            href={warranty.warrantyImage} 
+                            href={warranty.warrantyImage ? `/api/proxy/${warranty.warrantyImage.replace(/^https?:\/\/[^\/]+\//, '')}` : ''} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="w-full"
