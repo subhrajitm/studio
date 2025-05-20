@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Spinner } from '@/components/ui/spinner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { CalendarIcon, FileIcon, InfoIcon, TrashIcon, PencilIcon, ClockIcon, CalendarPlusIcon } from 'lucide-react';
-import { format, differenceInDays, isBefore } from 'date-fns';
+import { format, differenceInDays, isBefore, formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { Warranty } from '@/types';
 
@@ -61,15 +61,20 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
     if (!warranty) return null;
     
     const today = new Date();
-    const expiry = new Date(warranty.expiryDate);
+    const expiryDate = getValidDate(warranty.expiryDate);
     
-    if (isBefore(expiry, today)) {
+    // If we couldn't get a valid date, show an error badge
+    if (!expiryDate) {
+      return <Badge variant="outline">Invalid Date</Badge>;
+    }
+    
+    if (isBefore(expiryDate, today)) {
       return <Badge variant="destructive">Expired</Badge>;
     }
     
-    const daysRemaining = differenceInDays(expiry, today);
+    const daysLeft = differenceInDays(expiryDate, today);
     
-    if (daysRemaining <= 30) {
+    if (daysLeft <= 30) {
       return <Badge variant="warning">Expiring Soon</Badge>;
     }
     
@@ -77,8 +82,35 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
   };
   
   // Format date for display
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'MMMM d, yyyy');
+  const formatDate = (dateString: string | undefined | null) => {
+    if (!dateString) return 'N/A';
+    
+    // Try to parse the date and handle invalid dates
+    try {
+      const date = new Date(dateString);
+      
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        return 'Invalid date';
+      }
+      
+      return format(date, 'MMMM d, yyyy');
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid date';
+    }
+  };
+  
+  // Safely get a valid date object or null
+  const getValidDate = (dateString: string | undefined | null): Date | null => {
+    if (!dateString) return null;
+    
+    try {
+      const date = new Date(dateString);
+      return isNaN(date.getTime()) ? null : date;
+    } catch {
+      return null;
+    }
   };
   
   // Handle warranty deletion
@@ -519,9 +551,24 @@ const WarrantyDetail: React.FC<WarrantyDetailProps> = ({ warrantyId }) => {
                   <div className="flex items-center">
                     <ClockIcon className="h-5 w-5 mr-2 text-muted-foreground" />
                     <span>
-                      {isBefore(new Date(warranty.expiryDate), new Date()) 
-                        ? 'Expired ' + formatDistanceToNow(new Date(warranty.expiryDate), { addSuffix: true })
-                        : 'Expires ' + formatDistanceToNow(new Date(warranty.expiryDate), { addSuffix: true })}
+                      {(() => {
+                        // Validate the date before using it
+                        try {
+                          const expiryDate = new Date(warranty.expiryDate);
+                          
+                          // Check if the date is valid
+                          if (isNaN(expiryDate.getTime())) {
+                            return 'Invalid expiry date';
+                          }
+                          
+                          return isBefore(expiryDate, new Date())
+                            ? 'Expired ' + formatDistanceToNow(expiryDate, { addSuffix: true })
+                            : 'Expires ' + formatDistanceToNow(expiryDate, { addSuffix: true });
+                        } catch (error) {
+                          console.error('Error formatting expiry date:', error);
+                          return 'Invalid expiry date';
+                        }
+                      })()}
                     </span>
                   </div>
                 </div>

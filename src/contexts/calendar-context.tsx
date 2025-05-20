@@ -57,7 +57,7 @@ export const CalendarProvider: React.FC<{ children: ReactNode }> = ({ children }
       if (type) queryParams.append('type', type);
       
       const response = await apiClient<{ events: CalendarEvent[] }>(
-        `/api/calendar/events${queryParams.toString() ? `?${queryParams.toString()}` : ''}`,
+        `/events${queryParams.toString() ? `?${queryParams.toString()}` : ''}`,
         { token }
       );
       
@@ -82,7 +82,7 @@ export const CalendarProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     try {
       const event = await apiClient<CalendarEvent>(
-        `/api/calendar/events/${id}`,
+        `/events/${id}`,
         { token }
       );
       
@@ -107,7 +107,7 @@ export const CalendarProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     try {
       const newEvent = await apiClient<CalendarEvent>(
-        '/api/calendar/events',
+        '/events',
         { 
           method: 'POST',
           data: eventData,
@@ -140,7 +140,7 @@ export const CalendarProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     try {
       const updatedEvent = await apiClient<CalendarEvent>(
-        `/api/calendar/events/${id}`,
+        `/events/${id}`,
         { 
           method: 'PUT',
           data: eventData,
@@ -177,7 +177,7 @@ export const CalendarProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     try {
       await apiClient(
-        `/api/calendar/events/${id}`,
+        `/events/${id}`,
         { 
           method: 'DELETE',
           token 
