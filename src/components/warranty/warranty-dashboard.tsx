@@ -262,35 +262,43 @@ const WarrantyDashboard = () => {
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {warranties.map((warranty) => (
-                    <Card key={warranty._id} className="h-full">
-                      <CardHeader>
-                        <div className="flex justify-between items-start">
-                          <CardTitle className="text-lg">{warranty.productName}</CardTitle>
+                    <Card key={warranty._id} className="h-full overflow-hidden border">
+                      <div className="p-3 pb-2 border-b">
+                        <div className="flex justify-between items-start gap-2 mb-1">
+                          <h3 className="font-medium text-sm truncate">{warranty.productName}</h3>
                           {getWarrantyStatus(warranty.expiryDate)}
                         </div>
-                        <CardDescription>
+                        <p className="text-xs text-muted-foreground truncate">
                           {warranty.productBrand} • {warranty.productCategory}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-2">
-                          <p><strong>Purchase Date:</strong> {formatDate(warranty.purchaseDate)}</p>
-                          <p><strong>Expiry Date:</strong> {formatDate(warranty.expiryDate)}</p>
-                          {warranty.retailer && (
-                            <p><strong>Retailer:</strong> {warranty.retailer}</p>
-                          )}
+                        </p>
+                      </div>
+                      <div className="p-3 py-2 text-xs space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Purchase:</span>
+                          <span>{formatDate(warranty.purchaseDate)}</span>
                         </div>
-                      </CardContent>
-                      <CardFooter className="flex justify-between">
-                        <Link href={`/warranties/${warranty._id}`}>
-                          <Button variant="outline">View Details</Button>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Expires:</span>
+                          <span>{formatDate(warranty.expiryDate)}</span>
+                        </div>
+                        {warranty.retailer && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Retailer:</span>
+                            <span className="truncate max-w-[120px]">{warranty.retailer}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex border-t">
+                        <Link href={`/warranties/${warranty._id}`} className="flex-1">
+                          <Button variant="ghost" size="sm" className="w-full rounded-none h-8">View</Button>
                         </Link>
-                        <Link href={`/warranties/${warranty._id}/edit`}>
-                          <Button variant="secondary">Edit</Button>
+                        <div className="w-px bg-border"></div>
+                        <Link href={`/warranties/${warranty._id}/edit`} className="flex-1">
+                          <Button variant="ghost" size="sm" className="w-full rounded-none h-8">Edit</Button>
                         </Link>
-                      </CardFooter>
+                      </div>
                     </Card>
                   ))}
                 </div>
@@ -328,51 +336,56 @@ const WarrantyDashboard = () => {
                   <p className="text-muted-foreground">No warranties expiring soon.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {expiringWarranties.map((warranty) => (
-                    <Card key={warranty._id} className="h-full">
-                      <CardHeader>
-                        <div className="flex justify-between items-start">
-                          <CardTitle className="text-lg">{warranty.productName}</CardTitle>
+                    <Card key={warranty._id} className="h-full overflow-hidden border">
+                      <div className="p-3 pb-2 border-b">
+                        <div className="flex justify-between items-start gap-2 mb-1">
+                          <h3 className="font-medium text-sm truncate">{warranty.productName}</h3>
                           {getWarrantyStatus(warranty.expiryDate)}
                         </div>
-                        <CardDescription>
+                        <p className="text-xs text-muted-foreground truncate">
                           {warranty.productBrand} • {warranty.productCategory}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-2">
-                          <p><strong>Purchase Date:</strong> {formatDate(warranty.purchaseDate)}</p>
-                          <p><strong>Expiry Date:</strong> {formatDate(warranty.expiryDate)}</p>
-                          <p className="text-warning font-medium">
-                            Expires {(() => {
-                              try {
-                                // Validate the date string before creating a Date object
-                                if (!warranty.expiryDate || !/^\d{4}-\d{2}-\d{2}/.test(warranty.expiryDate)) {
-                                  return 'soon';
-                                }
-                                const expiryDate = new Date(warranty.expiryDate);
-                                // Check if the date is valid
-                                if (isNaN(expiryDate.getTime())) {
-                                  return 'soon';
-                                }
-                                return formatDistanceToNow(expiryDate, { addSuffix: true });
-                              } catch (error) {
-                                console.error('Error formatting date:', error, warranty.expiryDate);
-                                return 'soon';
-                              }
-                            })()}
-                          </p>
+                        </p>
+                      </div>
+                      <div className="p-3 py-2 text-xs space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Purchase:</span>
+                          <span>{formatDate(warranty.purchaseDate)}</span>
                         </div>
-                      </CardContent>
-                      <CardFooter className="flex justify-between">
-                        <Link href={`/warranties/${warranty._id}`}>
-                          <Button variant="outline">View Details</Button>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Expires:</span>
+                          <span>{formatDate(warranty.expiryDate)}</span>
+                        </div>
+                        <div className="text-amber-600 text-xs font-medium">
+                          {(() => {
+                            try {
+                              // Validate the date string before creating a Date object
+                              if (!warranty.expiryDate || !/^\d{4}-\d{2}-\d{2}/.test(warranty.expiryDate)) {
+                                return 'Expires soon';
+                              }
+                              const expiryDate = new Date(warranty.expiryDate);
+                              // Check if the date is valid
+                              if (isNaN(expiryDate.getTime())) {
+                                return 'Expires soon';
+                              }
+                              return `Expires ${formatDistanceToNow(expiryDate, { addSuffix: true })}`;
+                            } catch (error) {
+                              console.error('Error formatting date:', error, warranty.expiryDate);
+                              return 'Expires soon';
+                            }
+                          })()}
+                        </div>
+                      </div>
+                      <div className="flex border-t">
+                        <Link href={`/warranties/${warranty._id}`} className="flex-1">
+                          <Button variant="ghost" size="sm" className="w-full rounded-none h-8">View</Button>
                         </Link>
-                        <Link href={`/warranties/${warranty._id}/edit`}>
-                          <Button variant="secondary">Edit</Button>
+                        <div className="w-px bg-border"></div>
+                        <Link href={`/warranties/${warranty._id}/edit`} className="flex-1">
+                          <Button variant="ghost" size="sm" className="w-full rounded-none h-8">Edit</Button>
                         </Link>
-                      </CardFooter>
+                      </div>
                     </Card>
                   ))}
                 </div>

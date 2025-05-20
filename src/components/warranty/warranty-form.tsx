@@ -197,9 +197,10 @@ const WarrantyForm: React.FC<WarrantyFormProps> = ({ initialData, isEditing = fa
                         <Select 
                           onValueChange={field.onChange} 
                           defaultValue={field.value}
+                          value={field.value} // Add explicit value prop
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-background text-foreground">
                               <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
                           </FormControl>
