@@ -264,19 +264,19 @@ const WarrantyDashboard = () => {
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                   {warranties.map((warranty) => (
-                    <Card key={warranty._id} className="h-full overflow-hidden border">
-                      <div className="p-3 pb-2 border-b">
-                        <div className="flex justify-between items-start gap-2 mb-1">
-                          <h3 className="font-medium text-sm truncate">{warranty.productName}</h3>
+                    <Card key={warranty._id} className="h-full overflow-hidden border shadow-sm">
+                      <div className="p-2 pb-1 border-b">
+                        <div className="flex justify-between items-start gap-1 mb-0.5">
+                          <h3 className="font-medium text-xs truncate">{warranty.productName}</h3>
                           {getWarrantyStatus(warranty.expiryDate)}
                         </div>
-                        <p className="text-xs text-muted-foreground truncate">
+                        <p className="text-[10px] text-muted-foreground truncate">
                           {warranty.productBrand} • {warranty.productCategory}
                         </p>
                       </div>
-                      <div className="p-3 py-2 text-xs space-y-1">
+                      <div className="p-2 py-1 text-[10px] space-y-0.5">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Purchase:</span>
                           <span>{formatDate(warranty.purchaseDate)}</span>
@@ -288,17 +288,17 @@ const WarrantyDashboard = () => {
                         {warranty.retailer && (
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Retailer:</span>
-                            <span className="truncate max-w-[120px]">{warranty.retailer}</span>
+                            <span className="truncate max-w-[100px]">{warranty.retailer}</span>
                           </div>
                         )}
                       </div>
                       <div className="flex border-t">
                         <Link href={`/warranties/${warranty._id}`} className="flex-1">
-                          <Button variant="ghost" size="sm" className="w-full rounded-none h-8">View</Button>
+                          <Button variant="ghost" size="sm" className="w-full rounded-none h-6 text-xs">View</Button>
                         </Link>
                         <div className="w-px bg-border"></div>
                         <Link href={`/warranties/${warranty._id}/edit`} className="flex-1">
-                          <Button variant="ghost" size="sm" className="w-full rounded-none h-8">Edit</Button>
+                          <Button variant="ghost" size="sm" className="w-full rounded-none h-6 text-xs">Edit</Button>
                         </Link>
                       </div>
                     </Card>
@@ -338,7 +338,7 @@ const WarrantyDashboard = () => {
                   <p className="text-muted-foreground">No warranties expiring soon.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                   {expiringWarranties.map((warranty) => (
                     <Card key={warranty._id} className="h-full overflow-hidden border">
                       <div className="p-3 pb-2 border-b">

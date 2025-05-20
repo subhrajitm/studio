@@ -54,16 +54,15 @@ export default function DashboardPage() {
     if (!warranties) return {
       totalWarranties: 0,
       totalValue: 0,
-      avgWarrantyLength: 0,
+      totalEvents: 0,
       topCategories: [],
       expiringCount: 0
     };
     
     const totalWarranties = warranties.length;
     const totalValue = warranties.reduce((sum, w) => sum + (w.purchasePrice || 0), 0);
-    const avgWarrantyLength = Math.round(
-      warranties.reduce((sum, w) => sum + w.warrantyLength, 0) / totalWarranties || 0
-    );
+    // Get total events count (using a placeholder value since we don't have actual events API data yet)
+    const totalEvents = 0; // This will be replaced with actual API call when events endpoint is ready
     
     // Group warranties by category
     const categoryCounts: Record<string, number> = {};
@@ -80,7 +79,7 @@ export default function DashboardPage() {
     return {
       totalWarranties,
       totalValue,
-      avgWarrantyLength,
+      totalEvents,
       topCategories,
       expiringCount: expiringWarranties?.length || 0
     };
@@ -247,13 +246,17 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
           
-          {/* Avg. Warranty Length */}
-          <Card className="bg-gradient-to-br from-purple-500/20 to-purple-600/10 border-purple-500/20">
-            <CardContent className="p-4 flex items-center">
-              <TrendingUp className="h-8 w-8 mr-3 text-purple-500" />
-              <div>
-                <p className="text-xs text-muted-foreground">Avg. Warranty Length</p>
-                <h3 className="text-2xl font-bold">{stats.avgWarrantyLength} months</h3>
+          {/* Total Events */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-2 bg-primary/10 rounded-full">
+                  <Calendar className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Total Events</p>
+                  <h3 className="text-2xl font-bold">{stats.totalEvents}</h3>
+                </div>
               </div>
             </CardContent>
           </Card>
