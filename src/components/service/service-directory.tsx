@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CustomSelect } from '@/components/ui/custom-select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pagination } from '@/components/ui/pagination';
 import { Spinner } from '@/components/ui/spinner';
@@ -110,64 +110,50 @@ const ServiceDirectory = () => {
             </form>
             
             <div className="flex flex-wrap gap-2">
-              <Select
+              <CustomSelect
                 value={selectedServiceType}
-                onValueChange={(value) => {
+                onChange={(value) => {
                   setSelectedServiceType(value);
                   handleFilterChange();
                 }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="All Service Types" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all-service-types">All Service Types</SelectItem>
-                  {serviceTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="All Service Types"
+                className="w-[180px]"
+                options={[
+                  { label: 'All Service Types', value: 'all-service-types' },
+                  ...serviceTypes.map(type => ({ label: type, value: type }))
+                ]}
+              />
               
-              <Select
+              <CustomSelect
                 value={selectedCompany}
-                onValueChange={(value) => {
+                onChange={(value) => {
                   setSelectedCompany(value);
                   handleFilterChange();
                 }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="All Companies" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all-companies">All Companies</SelectItem>
-                  {companies.map((company) => (
-                    <SelectItem key={company} value={company}>
-                      {company}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="All Companies"
+                className="w-[180px]"
+                options={[
+                  { label: 'All Companies', value: 'all-companies' },
+                  ...companies.map(company => ({ label: company, value: company }))
+                ]}
+              />
               
-              <Select
+              <CustomSelect
                 value={sortOption}
-                onValueChange={(value) => {
+                onChange={(value) => {
                   setSortOption(value);
                   handleFilterChange();
                 }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Sort By" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="nameAsc">Name (A-Z)</SelectItem>
-                  <SelectItem value="nameDesc">Name (Z-A)</SelectItem>
-                  <SelectItem value="companyAsc">Company (A-Z)</SelectItem>
-                  <SelectItem value="typeAsc">Type (A-Z)</SelectItem>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                </SelectContent>
-              </Select>
+                placeholder="Sort By"
+                className="w-[180px]"
+                options={[
+                  { label: 'Name (A-Z)', value: 'nameAsc' },
+                  { label: 'Name (Z-A)', value: 'nameDesc' },
+                  { label: 'Company (A-Z)', value: 'companyAsc' },
+                  { label: 'Type (A-Z)', value: 'typeAsc' },
+                  { label: 'Newest First', value: 'newest' }
+                ]}
+              />
             </div>
           </div>
         </CardContent>

@@ -213,12 +213,13 @@ const WarrantyDashboard = () => {
                 
                 <div className="flex gap-2">
                   <select
-                    className="px-3 py-2 border rounded-md"
+                    className="px-3 py-2 border rounded-md bg-background text-foreground"
                     value={selectedCategory}
                     onChange={(e) => {
                       setSelectedCategory(e.target.value);
                       handleFilterChange();
                     }}
+                    style={{ color: 'var(--foreground)', backgroundColor: 'var(--background)' }}
                   >
                     <option value="">All Categories</option>
                     <option value="electronics">Electronics</option>
@@ -229,12 +230,13 @@ const WarrantyDashboard = () => {
                   </select>
                   
                   <select
-                    className="px-3 py-2 border rounded-md"
+                    className="px-3 py-2 border rounded-md bg-background text-foreground"
                     value={selectedStatus}
                     onChange={(e) => {
                       setSelectedStatus(e.target.value);
                       handleFilterChange();
                     }}
+                    style={{ color: 'var(--foreground)', backgroundColor: 'var(--background)' }}
                   >
                     <option value="">All Status</option>
                     <option value="active">Active</option>

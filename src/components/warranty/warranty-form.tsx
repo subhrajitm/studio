@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CustomSelect, Option } from '@/components/ui/custom-select';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Spinner } from '@/components/ui/spinner';
 import { Warranty } from '@/types';
@@ -194,34 +194,23 @@ const WarrantyForm: React.FC<WarrantyFormProps> = ({ initialData, isEditing = fa
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Category*</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                          value={field.value} // Add explicit value prop
-                        >
-                          <FormControl>
-                            <SelectTrigger className="bg-background text-foreground">
-                              <SelectValue placeholder="Select a category" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {categories.length > 0 ? (
-                              categories.map((category) => (
-                                <SelectItem key={category} value={category}>
-                                  {category}
-                                </SelectItem>
-                              ))
-                            ) : (
-                              <>
-                                <SelectItem value="electronics">Electronics</SelectItem>
-                                <SelectItem value="appliances">Appliances</SelectItem>
-                                <SelectItem value="furniture">Furniture</SelectItem>
-                                <SelectItem value="automotive">Automotive</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                              </>
-                            )}
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <CustomSelect
+                            value={field.value || ''}
+                            onChange={field.onChange}
+                            placeholder="Select a category"
+                            options={categories.length > 0 
+                              ? categories.map(category => ({ label: category, value: category }))
+                              : [
+                                  { label: 'Electronics', value: 'electronics' },
+                                  { label: 'Appliances', value: 'appliances' },
+                                  { label: 'Furniture', value: 'furniture' },
+                                  { label: 'Automotive', value: 'automotive' },
+                                  { label: 'Other', value: 'other' }
+                                ]
+                            }
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
